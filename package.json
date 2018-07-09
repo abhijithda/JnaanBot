@@ -1,0 +1,24 @@
+{
+  "name": "jnaanbot",
+  "version": "1.0.0",
+  "description": "A bot to share the jnaan!",
+  "main": "index.js",
+  "dependencies": {
+    "node-telegram-bot-api": "^0.30.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/abhijithda/JnaanBot.git"
+  },
+  "author": "abhijith.da",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/abhijithda/JnaanBot/issues"
+  },
+  "homepage": "https://github.com/abhijithda/JnaanBot#readme"
+}
