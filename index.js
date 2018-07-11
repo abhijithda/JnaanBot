@@ -1,24 +1,24 @@
-process.env.NTBA_FIX_319 = 1;
-const TelegramBot = require('node-telegram-bot-api');
-
 const myConfig = require('./config');
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
 const token = myConfig.token()
+
+process.env.NTBA_FIX_319 = 1;
+const TelegramBot = require('node-telegram-bot-api');
+
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: true });
 
-bot.onText(/\/start/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Welcome", {
+bot.onText(/\/Panchaparamesti/, (msg) => {
+  bot.sendMessage(msg.chat.id, "Jai Jinendra", {
     "reply_markup": {
-      "keyboard": [["Sample text", "Second sample"], ["Keyboard"], ["I'm robot"]]
+      "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]]
     }
   });
 });
 
 bot.onText(/\/leave_group/, (msg) => {
   const chatId = msg.chat.id;
-
   bot.kickChatMember(chatId, msg.from.id).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }

@@ -1,5 +1,5 @@
 module.exports = {
     token: function() {
-       return TOKEN
+       return process.env.TOKEN
     }
  }
