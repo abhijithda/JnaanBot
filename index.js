@@ -1,9 +1,10 @@
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 
+const myConfig = require('./config');
 // replace the value below with the Telegram token you receive from @BotFather
-const token = 'YOUR_TELEGRAM_BOT_TOKEN';
-
+// const token = '${TELEGRAM_BOT_TOKEN}';
+const token = myConfig.token()
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: true });
 
@@ -130,22 +131,22 @@ bot.on('message', (msg) => {
     // Greetings here...
     case "hi":
     case "jai jinendra":
-      msg = "Jai Jinendra"
+      rmsg = "Jai Jinendra"
       break;
 
     case "bye":
     case "ciao":
     case "see you":
-      msg = "Hope to see you around again, Bye"
+      rmsg = "Hope to see you around again, Bye"
       break;
 
     case "thanks":
     case "thank you":
-      msg = "My pleasure :+1: "
+      rmsg = "My pleasure :+1: "
       break;
 
     case "leave group":
-      msg = "Do you want to leave group? click here: /leave_group."
+      rmsg = "Do you want to leave group? click here: /leave_group."
       break;
     case "play song":
       send_audio = 1
@@ -156,7 +157,7 @@ bot.on('message', (msg) => {
       break;
   }
   if (send_msg) {
-    bot.sendMessage(chatId, msg, reply_to_message_id => msg.body.from.id)
+    bot.sendMessage(chatId, rmsg)
     return
   }
   if (send_audio) {
