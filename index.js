@@ -9,6 +9,26 @@ const TelegramBot = require('node-telegram-bot-api');
 // Create a bot that uses 'polling' to fetch new updates
 const bot = new TelegramBot(token, { polling: true });
 
+var CronJob = require('cron').CronJob;
+try {
+  var job = new CronJob({
+    /*
+     * Runs everyday at 5:55:00 AM.
+     */
+    cronTime: '00 55 5 * * *',
+    onTick: function () {
+      recvs = myConfig.receivers()
+      for (r in recvs) {
+        bot.sendMessage(r, "Jai Jinendra")
+      }
+    },
+    start: true,
+    timeZone: 'America/Los_Angeles'
+  })
+} catch (ex) {
+  console.log("cron pattern not valid");
+};
+
 bot.onText(/\/Panchaparamesti/, (msg) => {
   bot.sendMessage(msg.chat.id, "Jai Jinendra", {
     "reply_markup": {
