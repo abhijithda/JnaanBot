@@ -12,15 +12,13 @@ const bot = new TelegramBot(token, { polling: true });
 var CronJob = require('cron').CronJob;
 try {
   var job = new CronJob({
-    /*
-     * Runs everyday at 5:55:00 AM.
-     */
-    cronTime: '00 55 5 * * *',
+    cronTime: myConfig.notify_time(),
     onTick: function () {
-      recvs = myConfig.receivers()
+      recvs = myConfig.notify_receivers()
+      msg = myConfig.notify_message()
       for (r in recvs) {
-        console.log("Sending cron event to " + recvs[r])
-        bot.sendMessage(recvs[r], "Jai Jinendra")
+        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+        bot.sendMessage(recvs[r], msg)
       }
     },
     start: true,
@@ -82,7 +80,7 @@ bot.on('callback_query', function (message) {
 });
 
 bot.onText(/\/Panchaparamesti/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Jai Jinendra", {
+  bot.sendMessage(msg.chat.id, "Pancha Paramestis", {
     "reply_markup": {
       "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]],
       'one_time_keyboard': true
