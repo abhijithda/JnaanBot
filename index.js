@@ -19,7 +19,8 @@ try {
     onTick: function () {
       recvs = myConfig.receivers()
       for (r in recvs) {
-        bot.sendMessage(r, "Jai Jinendra")
+        console.log("Sending cron event to " + recvs[r])
+        bot.sendMessage(recvs[r], "Jai Jinendra")
       }
     },
     start: true,
@@ -29,10 +30,62 @@ try {
   console.log("cron pattern not valid");
 };
 
+bot.onText(/\/events/, (msg) => {
+  bot.sendMessage(msg.chat.id, "Events", {
+    "reply_markup": {
+      "keyboard": [["Religious"], ["Social"]],
+      "remove_keyboard": true
+    }
+  });
+});
+
+function get_initiatives(cur_topic = 'initiatives') {
+  console.log("Current topic: " + cur_topic)
+  var topics = [];
+  if (cur_topic == 'initiatives') topics = [
+    { text: "Classes", callback_data: "classes" },
+    { text: "Hathkargha", callback_data: "hathkargha" },
+    { text: "Kind Milk", callback_data: "kindmilk" }
+  ]
+  if (cur_topic == 'classes') topics = [
+    { text: "Weekday", callback_data: "weekday_classes" },
+    { text: "Weekend", callback_data: "weekend_classes" }
+  ]
+  if (cur_topic == 'weekday_classes') topics = [
+    { text: "Cha-dhal Morning Classes", callback_data: "chadhal_morning" },
+    { text: "Cha-dhal Evening Classes", callback_data: "chadhal_evening" }
+  ]
+  if (cur_topic == 'kindmilk') topics = [
+    { text: "About", callback_data: "kindmilk_about" },
+    { text: "Contact", callback_data: "kindmilk_contact" }
+  ]
+
+  return {
+    reply_markup: JSON.stringify({
+      inline_keyboard: [
+        topics,
+        [{ text: "Initiatives", callback_data: "initiatives" }]
+      ]
+    })
+  };
+
+}
+
+bot.onText(/\/initiatives/, (msg) => {
+  bot.sendMessage(msg.chat.id, "Initiatives", get_initiatives());
+});
+
+bot.on('callback_query', function (message) {
+  var msg = message.message;
+  var editOptions = Object.assign({}, get_initiatives(message.data), { chat_id: msg.chat.id, message_id: msg.message_id });
+  bot.editMessageText(message.data, editOptions);
+});
+
 bot.onText(/\/Panchaparamesti/, (msg) => {
   bot.sendMessage(msg.chat.id, "Jai Jinendra", {
     "reply_markup": {
-      "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]]
+      "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]],
+      'one_time_keyboard': true
     }
   });
 });
@@ -52,7 +105,6 @@ bot.onText(/\/echo (.+)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
-
   const chatId = msg.chat.id;
   const resp = match[1]; // the captured "whatever"
 
@@ -150,8 +202,10 @@ bot.on('message', (msg) => {
   switch (msg.text.toString().toLowerCase()) {
     // Greetings here...
     case "hi":
+    case "hello":
+    case "jj":
     case "jai jinendra":
-      rmsg = "Jai Jinendra"
+      rmsg = "Jai Jinendra 🙏"
       break;
 
     case "bye":
@@ -162,7 +216,7 @@ bot.on('message', (msg) => {
 
     case "thanks":
     case "thank you":
-      rmsg = "My pleasure :+1: "
+      rmsg = "My pleasure 👍"
       break;
 
     case "leave group":
@@ -178,7 +232,7 @@ bot.on('message', (msg) => {
   }
   if (send_msg) {
     bot.sendMessage(chatId, rmsg)
-    return
+    // return
   }
   if (send_audio) {
     var song = "/Users/abhijith.da/desktop backup/songs/karishma nagda/jeni aankho prasam zarti.mp3"
@@ -195,8 +249,7 @@ bot.on('message', (msg) => {
 
   // send a message to the chat acknowledging receipt of their message
   // bot.sendMessage(chatId, chatId.toString() + '...!');
-  bot.sendMessage(chatId, '...!');
+  // bot.sendMessage(chatId, '...!');
 
   // getUserProfilePhotos(chatId)
 });
-
