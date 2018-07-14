@@ -158,8 +158,10 @@ Bhakthi Timings:
 }
 
 function runCmd(msg) {
-  console.log("Running command with ", msg.text)
-  var resp = get_contents(msg.text)
+  var msgTxt = msg.text.split("@")
+  var cmd = msgTxt[0]
+  console.log("Running command: ", cmd)
+  var resp = get_contents(cmd)
   send_msg = resp[0]
   msgdata = resp[1]
   console.log("Command result: ", msgdata)
