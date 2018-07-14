@@ -68,11 +68,35 @@ function get_contents(cur_topic) {
     P.S. In case Vidhaan is not completed, on the last day Friday July 27, we may continue beyond 8:30 AM.`
   }
   if (cur_topic == '/initiatives') topics = [
-    { text: "Classes", callback_data: "classes" },
+    { text: "Arham Yoga", callback_data: "arham_yoga" },
+    { text: "Bhakthi", callback_data: "bhakthi" },
+    { text: "Classes", callback_data: "/classes" },
     { text: "Hathkargha", callback_data: "hathkargha" },
-    { text: "Kind Milk", callback_data: "kindmilk" }
+    { text: "Kind Milk", callback_data: "kindmilk" },
+    { text: "Vidhyanjali", callback_data: "vidhyanjali" }
   ]
-  if (cur_topic == 'classes') topics = [
+  if (cur_topic == 'arham_yoga') {
+    send_msg = 1
+    new_msg = "To know more or join to Arham Yoga classes, please Contact: @charu ji."
+  }
+  if (cur_topic == 'bhakthi') {
+    topics = [
+      { text: "Timings", callback_data: "bhakthi_about" },
+      { text: "Contact", callback_data: "bhakthi_contact" }
+    ]
+  }
+  if (cur_topic == 'bhakthi_about') {
+    send_msg = 1
+    new_msg = `
+Bhakthi Timings:
+    Every (almost every!) Thursdays' 8 PM to 9 PM.
+    `
+  }
+  if (cur_topic == 'bhakthi_contact') {
+    send_msg = 1
+    new_msg = "To know more or to join Thursday's Bhakthi, please Contact: @bhumika ji or @surbhi ji."
+  }
+  if (cur_topic == '/classes') topics = [
     { text: "Weekday", callback_data: "weekday_classes" },
     { text: "Weekend", callback_data: "weekend_classes" }
   ]
@@ -80,30 +104,54 @@ function get_contents(cur_topic) {
     { text: "Cha-dhal Morning Classes", callback_data: "chadhal_morning" },
     { text: "Cha-dhal Evening Classes", callback_data: "chadhal_evening" }
   ]
+  if (cur_topic == 'weekend_classes') topics = [
+    { text: "Sunday Morning Swadhay Class at Temple", callback_data: "sunday_swadhya_at_temple" },
+    { text: "Sunday Morning Swadhay Class online", callback_data: "sunday_swadhya_online" },
+  ]
+  if (cur_topic == 'sunday_swadhya_online') {
+    send_msg = 1
+    new_msg = "For Sunday Swadhya Online class, please Contact: @shrish ji for details."
+  }
+  if (cur_topic == 'sunday_swadhya_at_temple') {
+    send_msg = 1
+    new_msg = "For Sunday Swadhya class at temple, please Contact: @parag ji or @ruchi ji for details."
+  }
+  if (cur_topic == 'hathkargha') {
+    send_msg = 1
+    new_msg = "To know more about Hathkargha, please Contact: @charu ji, @ruchi ji or @gourav ji for details."
+  }
   if (cur_topic == 'kindmilk') topics = [
     { text: "About", callback_data: "kindmilk_about" },
     { text: "Contact", callback_data: "kindmilk_contact" }
   ]
+  if (cur_topic == 'kindmilk_contact') {
+    send_msg = 1
+    new_msg = "To know more about Kind Milk project, please Contact: @parag ji or @shaily ji for details."
+  }
 
   console.log("Send msg", send_msg)
   if (send_msg == 0 || new_msg.length == 0) {
     var json_data = {}
-    if (topics.length == 0 && cur_topic != "Data is not available") {
-      topics = [{ text: "Data is not available.", callback_data: "Data is not available" }]
-    }
+    // if (topics.length == 0 && cur_topic != "Data is not available") {
+    //   topics = [{ text: "Data is not available.", callback_data: "Data is not available" }]
+    // }
     if (topics.length != 0) {
       json_data = {
         inline_keyboard: [
           topics
         ]
       }
+      console.log("JSON data: ", json_data)
+      return [send_msg, {
+        reply_markup: JSON.stringify(
+          json_data
+        )
+      }];
+    } else {
+      send_msg = 1;
+      new_msg = " I don't have any details of '" + cur_topic +
+        "' yet. Please check with group for the details."
     }
-    console.log("Topics: ", json_data)
-    return [send_msg, {
-      reply_markup: JSON.stringify(
-        json_data
-      )
-    }];
   }
   console.log("Message: ", new_msg)
   return [send_msg, new_msg]
@@ -122,18 +170,15 @@ function runCmd(msg) {
   });
 }
 
-bot.onText(/\/events/, (msg) => {
-  runCmd(msg)
-});
-
 bot.onText(/\/help/, (msg) => {
   msgdata = `
 
 Following commands are available: 
 
-  /events - show upcoming events
-  /initiatives - show initiatives group members are associated with
-  /improvebot - join the Bot group to help improve it's abilities
+  /classes - show swadhay classes.
+  /events - show upcoming events.
+  /initiatives - show initiatives group members are associated with.
+  /improvebot - join the BotDev group to help improve it's abilities.
   /tithi - show today's tithi
 `
 
@@ -145,9 +190,10 @@ Following commands are available:
 });
 
 bot.onText(/\/improvebot/, (msg) => {
-  msgdata = `
+  msgdata =
+    `
   Appreciated your interest in improving this Bot 👍. 
-  Please search for this group's name and join the group ending with "BotDev".
+  Join @DJSanghBotDev group to coordinate with people to help improve the bot.
 `
 
   bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
@@ -155,6 +201,14 @@ bot.onText(/\/improvebot/, (msg) => {
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
   });
+});
+
+bot.onText(/\/events/, (msg) => {
+  runCmd(msg)
+});
+
+bot.onText(/\/classes/, (msg) => {
+  runCmd(msg)
 });
 
 bot.onText(/\/initiatives/, (msg) => {
@@ -172,7 +226,7 @@ bot.on('callback_query', function (message) {
   var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
   bot.editMessageText(message.data, editOptions);
   if (send_msg) {
-    msgdata = "Message from " + msg.chat.first_name + " (@" + msg.chat.username + ") " + `
+    msgdata = "Providing details to " + msg.chat.first_name + " (@" + msg.chat.username + ") " + `
 
      `+ msgdata
     bot.sendMessage(msg.chat.id, msgdata).catch((error) => {

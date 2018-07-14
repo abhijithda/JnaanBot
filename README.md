@@ -7,10 +7,11 @@ A bot to share the Jnaan!
 ### Available Commands
 
 ```commands
+classes - show swadhay classes.
 events - show upcoming events
-tithi - show today's tithi
 initiatives - show initiatives group members are associated with
 improvebot - join the Bot group to help improve it's abilities
+tithi - show today's tithi
 ```
 
 ## Setup Bot
