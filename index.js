@@ -226,7 +226,7 @@ bot.on('callback_query', function (message) {
   var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
   bot.editMessageText(message.data, editOptions);
   if (send_msg) {
-    msgdata = "Providing details to " + msg.chat.first_name + " (@" + msg.chat.username + ") " + `
+    msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
 
      `+ msgdata
     bot.sendMessage(msg.chat.id, msgdata).catch((error) => {

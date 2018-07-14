@@ -25,4 +25,3 @@ Set the following environmnet variables
 TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
 RECEIVERS="<receiver1>, <receiver2>, ... <receiverN>"
 ```
-
