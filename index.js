@@ -28,19 +28,46 @@ try {
   console.log("cron pattern not valid");
 };
 
-bot.onText(/\/events/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Events", {
-    "reply_markup": {
-      "keyboard": [["Religious"], ["Social"]],
-      "remove_keyboard": true
-    }
-  });
-});
-
-function get_initiatives(cur_topic = 'initiatives') {
+function get_contents(cur_topic) {
   console.log("Current topic: " + cur_topic)
   var topics = [];
-  if (cur_topic == 'initiatives') topics = [
+  var send_msg = 0
+  var new_msg = ""
+
+  if (cur_topic == '/events') topics = [
+    { text: "Religious", callback_data: "religious" },
+    { text: "Social", callback_data: "social" }
+  ]
+  if (cur_topic == 'religious') topics = [
+    { text: "Ashtanika Parva", callback_data: "ashtanika" }
+  ]
+  if (cur_topic == 'ashtanika') topics = [
+    { text: "Date & Pooja Details", callback_data: "Ashtanika Details:" },
+  ]
+  if (cur_topic == 'Ashtanika Details:') {
+    send_msg = 1;
+    new_msg = `
+    Ashtanika Parva from July 19 thru 27, 2018.
+    
+    During this time celestial beings go to the Nandishwar dweep to do puja of Jinendra Bhagwaan. We human beings cannot go there, so we all go to our temple and do the puja at our temples.
+
+    This year we will do the NandishwarDweep Vidhaan during the Ashtanika Parva.
+
+    The vidhaan pooja will start after Jinendra Abhishek at 7 AM.
+
+    Please plan to take dharam laabh and confirm your attendance by signing your name on the sign-up sheet at the temple. We will need volunteers to prepare for the vidhaan puja thalis etc., so please also sign-up for the same.
+
+    Vidhaan schedule:
+    Dates: July 19 to July 27.
+
+    Weekdays:
+    Vidhaan puja 6:30 AM to  8:30 AM
+    Weekends: (July 21 and 22)
+    Vidhaan puja 7:30 AM to  10:00 AM
+
+    P.S. In case Vidhaan is not completed, on the last day Friday July 27, we may continue beyond 8:30 AM.`
+  }
+  if (cur_topic == '/initiatives') topics = [
     { text: "Classes", callback_data: "classes" },
     { text: "Hathkargha", callback_data: "hathkargha" },
     { text: "Kind Milk", callback_data: "kindmilk" }
@@ -58,25 +85,102 @@ function get_initiatives(cur_topic = 'initiatives') {
     { text: "Contact", callback_data: "kindmilk_contact" }
   ]
 
-  return {
-    reply_markup: JSON.stringify({
-      inline_keyboard: [
-        topics,
-        [{ text: "Initiatives", callback_data: "initiatives" }]
-      ]
-    })
-  };
-
+  console.log("Send msg", send_msg)
+  if (send_msg == 0 || new_msg.length == 0) {
+    var json_data = {}
+    if (topics.length == 0 && cur_topic != "Data is not available") {
+      topics = [{ text: "Data is not available.", callback_data: "Data is not available" }]
+    }
+    if (topics.length != 0) {
+      json_data = {
+        inline_keyboard: [
+          topics
+        ]
+      }
+    }
+    console.log("Topics: ", json_data)
+    return [send_msg, {
+      reply_markup: JSON.stringify(
+        json_data
+      )
+    }];
+  }
+  console.log("Message: ", new_msg)
+  return [send_msg, new_msg]
 }
 
+function runCmd(msg) {
+  console.log("Running command with ", msg.text)
+  var resp = get_contents(msg.text)
+  send_msg = resp[0]
+  msgdata = resp[1]
+  console.log("Command result: ", msgdata)
+  bot.sendMessage(msg.chat.id, msg.text, msgdata).catch((error) => {
+    console.log(error.code);  // => 'ETELEGRAM'
+    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(chatId, error.response.body.description)
+  });
+}
+
+bot.onText(/\/events/, (msg) => {
+  runCmd(msg)
+});
+
+bot.onText(/\/help/, (msg) => {
+  msgdata = `
+
+Following commands are available: 
+
+  /events - show upcoming events
+  /initiatives - show initiatives group members are associated with
+  /improvebot - join the Bot group to help improve it's abilities
+  /tithi - show today's tithi
+`
+
+  bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+    console.log(error.code);  // => 'ETELEGRAM'
+    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(chatId, error.response.body.description)
+  });
+});
+
+bot.onText(/\/improvebot/, (msg) => {
+  msgdata = `
+  Appreciated your interest in improving this Bot 👍. 
+  Please search for this group's name and join the group ending with "BotDev".
+`
+
+  bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+    console.log(error.code);  // => 'ETELEGRAM'
+    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(chatId, error.response.body.description)
+  });
+});
+
 bot.onText(/\/initiatives/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Initiatives", get_initiatives());
+  runCmd(msg)
 });
 
 bot.on('callback_query', function (message) {
+  console.log("callback_query message: ", message)
   var msg = message.message;
-  var editOptions = Object.assign({}, get_initiatives(message.data), { chat_id: msg.chat.id, message_id: msg.message_id });
+  var resp = get_contents(message.data)
+  send_msg = resp[0]
+  msgdata = resp[1]
+  // msgdata = resp
+  console.log("callback_query message data: ", msgdata)
+  var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
   bot.editMessageText(message.data, editOptions);
+  if (send_msg) {
+    msgdata = "Message from " + msg.chat.first_name + " (@" + msg.chat.username + ") " + `
+
+     `+ msgdata
+    bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+      console.log(error.code);  // => 'ETELEGRAM'
+      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      bot.sendMessage(chatId, error.response.body.description)
+    });
+  }
 });
 
 bot.onText(/\/Panchaparamesti/, (msg) => {
@@ -94,7 +198,7 @@ bot.onText(/\/leave_group/, (msg) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
-  });;
+  });
 });
 
 
