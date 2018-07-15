@@ -83,10 +83,12 @@ function get_contents(cur_topic) {
     new_msg = "To know more or join to Arham Yoga classes, please Contact: @charu ji."
   }
   if (cur_topic == 'bhakthi') {
-    topics = [
+    topics = [[
       { text: "Timings", callback_data: "bhakthi_about" },
       { text: "Contact", callback_data: "bhakthi_contact" }
-    ]
+    ], [
+      { text: "Jina Bhakthi Geeta", callback_data: "jbg_group" }
+    ]]
   }
   if (cur_topic == 'bhakthi_about') {
     send_msg = 1
@@ -98,6 +100,13 @@ Bhakthi Timings:
   if (cur_topic == 'bhakthi_contact') {
     send_msg = 1
     new_msg = "To know more or to join Thursday's Bhakthi, please Contact: @bhumika ji or @surbhi ji."
+  }
+  if (cur_topic == 'jbg_group') {
+    send_msg = 1
+    new_msg = `
+Jina Bhakthi Geete:
+To share and/or listen to Jina Bhakthi Geete / Jain Devotional Songs, join telegram app group: https://t.me/joinchat/I4W0OxFWDFDpW4Nbhe-eAg.
+`
   }
   if (cur_topic == '/classes') topics = [
     { text: "Weekday", callback_data: "weekday_classes" },
@@ -113,7 +122,11 @@ Bhakthi Timings:
   ]
   if (cur_topic == 'sunday_swadhya_online') {
     send_msg = 1
-    new_msg = "For Sunday Swadhya Online class, please Contact: @shrish ji for details."
+    new_msg = `
+Sunday Swadhya Online class:
+Here are instructions to join swadhyaya: https://sites.google.com/view/weekly-swadhyaya/home?authuser=0.
+To know more details, contact @shrish ji or @nikita ji.
+`
   }
   if (cur_topic == 'sunday_swadhya_at_temple') {
     send_msg = 1
@@ -131,15 +144,21 @@ Bhakthi Timings:
     send_msg = 1
     new_msg = "To know more about Kind Milk project, please Contact: @parag ji or @shaily ji for details."
   }
+  if (cur_topic == 'vidhyanjali') {
+    send_msg = 1
+    new_msg = `
+Vidhyanjali:
 
+Video: https://youtu.be/4t-kxa38KG4.
+
+To know more details, contact @charu ji.
+`
+  }
   console.log("Send msg", send_msg)
   if (send_msg == 0 || new_msg.length == 0) {
     var json_data = {}
-    // if (topics.length == 0 && cur_topic != "Data is not available") {
-    //   topics = [{ text: "Data is not available.", callback_data: "Data is not available" }]
-    // }
     if (topics.length != 0) {
-      if (typeof (topics[0]) == 'string') {
+      if (Object.prototype.toString.call(topics[0]) == '[object Object]') {
         topics = [topics]
       }
       json_data = {
@@ -227,7 +246,6 @@ bot.on('callback_query', function (message) {
   var resp = get_contents(message.data)
   send_msg = resp[0]
   msgdata = resp[1]
-  // msgdata = resp
   console.log("callback_query message data: ", msgdata)
   var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
   bot.editMessageText(message.data, editOptions);
