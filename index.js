@@ -222,7 +222,7 @@ bot.onText(/\/improvebot/, (msg) => {
   msgdata =
     `
   Appreciated your interest in improving this Bot 👍. 
-  Join @DJSanghBotDev group to coordinate with people to help improve the bot.
+  Join DJSanghBotDev group to coordinate with people to help improve the bot.
 `
 
   bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
@@ -369,7 +369,7 @@ bot.onText(/\/get_day/, (msg) => {
   bot.sendMessage(chatId, day);
 });
 
-bot.onText(/\/get_tithi/, (msg) => {
+bot.onText(/\/tithi/, (msg) => {
   // 'msg' is the received Message from Telegram
   const chatId = msg.chat.id;
   bot.sendMessage(chatId, "To Be Implemented! Need to gather data!!");
