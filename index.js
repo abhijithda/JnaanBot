@@ -68,12 +68,15 @@ function get_contents(cur_topic) {
     P.S. In case Vidhaan is not completed, on the last day Friday July 27, we may continue beyond 8:30 AM.`
   }
   if (cur_topic == '/initiatives') topics = [
-    { text: "Arham Yoga", callback_data: "arham_yoga" },
-    { text: "Bhakthi", callback_data: "bhakthi" },
-    { text: "Classes", callback_data: "/classes" },
-    { text: "Hathkargha", callback_data: "hathkargha" },
-    { text: "Kind Milk", callback_data: "kindmilk" },
-    { text: "Vidhyanjali", callback_data: "vidhyanjali" }
+    [
+      { text: "Arham Yoga", callback_data: "arham_yoga" },
+      { text: "Bhakthi", callback_data: "bhakthi" },
+      { text: "Classes", callback_data: "/classes" },
+    ], [
+      { text: "Hathkargha", callback_data: "hathkargha" },
+      { text: "Kind Milk", callback_data: "kindmilk" },
+      { text: "Vidhyanjali", callback_data: "vidhyanjali" }
+    ]
   ]
   if (cur_topic == 'arham_yoga') {
     send_msg = 1
@@ -136,10 +139,11 @@ Bhakthi Timings:
     //   topics = [{ text: "Data is not available.", callback_data: "Data is not available" }]
     // }
     if (topics.length != 0) {
+      if (typeof (topics[0]) == 'string') {
+        topics = [topics]
+      }
       json_data = {
-        inline_keyboard: [
-          topics
-        ]
+        inline_keyboard: topics
       }
       console.log("JSON data: ", json_data)
       return [send_msg, {
