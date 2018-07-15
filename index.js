@@ -195,10 +195,13 @@ function runCmd(msg) {
   });
 }
 
-bot.onText(/\/help/, (msg) => {
+bot.onText(/\/help|\/start/, (msg) => {
   msgdata = `
+*Jai Jinendra*
 
-Following commands are available: 
+I can help you find some of the answers related to *DJSangh*.
+
+You can control me by sending these commands: 
 
   /classes - show swadhay classes.
   /events - show upcoming events.
@@ -207,7 +210,8 @@ Following commands are available:
   /tithi - show today's tithi
 `
 
-  bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+  console.log("Message: %v", msg)
+  bot.sendMessage(msg.chat.id, msgdata, {parse_mode: "Markdown", reply_to_message_id: msg.message_id}).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
@@ -253,7 +257,7 @@ bot.on('callback_query', function (message) {
     msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
 
      `+ msgdata
-    bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+    bot.sendMessage(msg.chat.id, msgdata, {reply_to_message_id: msg.message_id}).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
@@ -411,7 +415,7 @@ bot.on('message', (msg) => {
       break;
   }
   if (send_msg) {
-    bot.sendMessage(chatId, rmsg)
+    bot.sendMessage(chatId, rmsg, {reply_to_message_id: msg.message_id})
     // return
   }
   if (send_audio) {
