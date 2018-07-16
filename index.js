@@ -221,11 +221,11 @@ You can control me by sending these commands:
 bot.onText(/\/improvebot/, (msg) => {
   msgdata =
     `
-  Appreciated your interest in improving this Bot 👍. 
-  Join DJSanghBotDev group to coordinate with people to help improve the bot.
+Appreciate your interest in improving this Bot 👍. 
+Join [DJSanghBotDev](https://t.me/joinchat/I4W0Ow9J37gDlkn0VRRlyw) group to share your insights in improving the bot.
 `
 
-  bot.sendMessage(msg.chat.id, msgdata).catch((error) => {
+  bot.sendMessage(msg.chat.id, msgdata, {parse_mode: "Markdown"}).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
