@@ -80,7 +80,7 @@ function get_contents(cur_topic) {
   ]
   if (cur_topic == 'arham_yoga') {
     send_msg = 1
-    new_msg = "To know more or join to Arham Yoga classes, please Contact: @charu ji."
+    new_msg = "To know more or join to Arham Yoga classes, please Contact: charu ji."
   }
   if (cur_topic == 'bhakthi') {
     topics = [[
@@ -99,7 +99,7 @@ Bhakthi Timings:
   }
   if (cur_topic == 'bhakthi_contact') {
     send_msg = 1
-    new_msg = "To know more or to join Thursday's Bhakthi, please Contact: @bhumika ji or @surbhi ji."
+    new_msg = "To know more or to join Thursday's Bhakthi, please Contact: bhumika ji or surbhi ji."
   }
   if (cur_topic == 'jbg_group') {
     send_msg = 1
@@ -117,24 +117,24 @@ To share and/or listen to Jina Bhakthi Geete / Jain Devotional Songs, join teleg
     { text: "Cha-dhal Evening Classes", callback_data: "chadhal_evening" }
   ]
   if (cur_topic == 'weekend_classes') topics = [
-    { text: "Sunday Morning Swadhay Class at Temple", callback_data: "sunday_swadhya_at_temple" },
-    { text: "Sunday Morning Swadhay Class online", callback_data: "sunday_swadhya_online" },
+    { text: "Sunday at Temple", callback_data: "sunday_swadhya_at_temple" },
+    { text: "Sunday online", callback_data: "sunday_swadhya_online" },
   ]
   if (cur_topic == 'sunday_swadhya_online') {
     send_msg = 1
     new_msg = `
 Sunday Swadhya Online class:
 Here are instructions to join swadhyaya: https://sites.google.com/view/weekly-swadhyaya/home?authuser=0.
-To know more details, contact @shrish ji or @nikita ji.
+To know more details, contact Shrish ji or Nikita ji.
 `
   }
   if (cur_topic == 'sunday_swadhya_at_temple') {
     send_msg = 1
-    new_msg = "For Sunday Swadhya class at temple, please Contact: @parag ji or @ruchi ji for details."
+    new_msg = "For Sunday Swadhya class at temple, please Contact: Parag ji or Ruchi ji for details."
   }
   if (cur_topic == 'hathkargha') {
     send_msg = 1
-    new_msg = "To know more about Hathkargha, please Contact: @charu ji, @ruchi ji or @gourav ji for details."
+    new_msg = "To know more about Hathkargha, please Contact: Charu ji, Ruchi ji or Gourav ji for details."
   }
   if (cur_topic == 'kindmilk') topics = [
     { text: "About", callback_data: "kindmilk_about" },
@@ -142,7 +142,7 @@ To know more details, contact @shrish ji or @nikita ji.
   ]
   if (cur_topic == 'kindmilk_contact') {
     send_msg = 1
-    new_msg = "To know more about Kind Milk project, please Contact: @parag ji or @shaily ji for details."
+    new_msg = "To know more about Kind Milk project, please Contact: parag ji or shaily ji for details."
   }
   if (cur_topic == 'vidhyanjali') {
     send_msg = 1
@@ -151,7 +151,7 @@ Vidhyanjali:
 
 Video: https://youtu.be/4t-kxa38KG4.
 
-To know more details, contact @charu ji.
+To know more details, contact charu ji.
 `
   }
   console.log("Send msg", send_msg)
