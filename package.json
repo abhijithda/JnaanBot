@@ -9,7 +9,7 @@
   },
   "devDependencies": {},
     "scripts": {
-    "start": "node index.js $TOKEN $NOTIFY_MESSAGE $NOTIFY_RECEIVERS $NOTIFY_TIME",
+    "start": "node index.js $TOKEN $NOTIFY_MESSAGE $NOTIFY_RECEIVERS $NOTIFY_TIME 2>&1 | tee -a /mnt/log/console.log",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

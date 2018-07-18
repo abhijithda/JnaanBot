@@ -71,7 +71,6 @@ function get_contents(cur_topic) {
     [
       { text: "Arham Yoga", callback_data: "arham_yoga" },
       { text: "Bhakthi", callback_data: "bhakthi" },
-      { text: "Classes", callback_data: "/classes" },
     ], [
       { text: "Hathkargha", callback_data: "hathkargha" },
       { text: "Kind Milk", callback_data: "kindmilk" },
@@ -269,7 +268,8 @@ bot.onText(/\/Panchaparamesti/, (msg) => {
   bot.sendMessage(msg.chat.id, "Pancha Paramestis", {
     "reply_markup": {
       "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]],
-      'one_time_keyboard': true
+      // one_time_keyboard: true,
+      resize_keyboard: true
     }
   });
 });
