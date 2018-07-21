@@ -250,8 +250,6 @@ bot.on('callback_query', function (message) {
   send_msg = resp[0]
   msgdata = resp[1]
   console.log("callback_query message data: ", msgdata)
-  var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
-  bot.editMessageText(message.data, editOptions);
   if (send_msg) {
     msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
 
@@ -261,6 +259,9 @@ bot.on('callback_query', function (message) {
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
     });
+  } else {
+    var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
+    bot.editMessageText(message.data, editOptions);  
   }
 });
 
