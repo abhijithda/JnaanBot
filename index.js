@@ -2,6 +2,7 @@ const myConfig = require('./config');
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
 const token = myConfig.token()
+const myData = require('./getdata')
 
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
@@ -28,7 +29,7 @@ try {
   console.log("cron pattern not valid");
 };
 
-function get_contents(cur_topic) {
+function _get_contents(cur_topic) {
   console.log("Current topic: " + cur_topic)
   var topics = [];
   var send_msg = 0
@@ -179,6 +180,49 @@ To know more details, contact charu ji.
   return [send_msg, new_msg]
 }
 
+function get_contents(cur_topic) {
+  console.log("Current topic: " + cur_topic)
+  // var topics = [];
+  var topics
+  var send_msg = 0
+  var new_msg = ""
+
+  console.log("topics from getData before: ", topics)
+  topics = myData.getData(cur_topic)
+  console.log("topics from getData: ", topics)
+
+  console.log(Object.prototype.toString.call(topics))
+  if (Object.prototype.toString.call(topics) == '[object String]') {
+    send_msg = 1
+    new_msg = topics
+  }
+
+  console.log("Send msg", send_msg)
+  if (send_msg == 0 || new_msg.length == 0) {
+    var json_data = {}
+    if (topics.length != 0) {
+      if (Object.prototype.toString.call(topics[0]) == '[object Object]') {
+        topics = [topics]
+      }
+      json_data = {
+        inline_keyboard: topics
+      }
+      console.log("JSON data: ", json_data)
+      return [send_msg, {
+        reply_markup: JSON.stringify(
+          json_data
+        )
+      }];
+    } else {
+      send_msg = 1;
+      new_msg = " I don't have any details of '" + cur_topic +
+        "' yet. Please check with group for the details."
+    }
+  }
+  console.log("Message: ", new_msg)
+  return [send_msg, new_msg]
+}
+
 function runCmd(msg) {
   var msgTxt = msg.text.split("@")
   var cmd = msgTxt[0]
@@ -208,9 +252,10 @@ You can control me by sending these commands:
   /improvebot - join the BotDev group to help improve it's abilities.
   /tithi - show today's tithi
 `
+  msgdata = myData.getData("/help")
 
   console.log("Message: %v", msg)
-  bot.sendMessage(msg.chat.id, msgdata, {parse_mode: "Markdown", reply_to_message_id: msg.message_id}).catch((error) => {
+  bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
@@ -224,7 +269,11 @@ Appreciate your interest in improving this Bot 👍.
 Join [DJSanghBotDev](https://t.me/joinchat/I4W0Ow9J37gDlkn0VRRlyw) group to share your insights in improving the bot.
 `
 
-  bot.sendMessage(msg.chat.id, msgdata, {parse_mode: "Markdown"}).catch((error) => {
+  bot.sendMessage(msg.chat.id, msgdata,
+    {
+      parse_mode: "Markdown"
+    }
+  ).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
@@ -254,23 +303,29 @@ bot.on('callback_query', function (message) {
     msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
 
      `+ msgdata
-    bot.sendMessage(msg.chat.id, msgdata, {reply_to_message_id: msg.message_id}).catch((error) => {
+    bot.sendMessage(msg.chat.id, msgdata,
+      {
+        parse_mode: "Markdown",
+        reply_to_message_id: msg.message_id
+      }
+    ).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
     });
   } else {
     var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
-    bot.editMessageText(message.data, editOptions);  
+    bot.editMessageText(message.data, editOptions);
   }
 });
 
 bot.onText(/\/Panchaparamesti/, (msg) => {
   bot.sendMessage(msg.chat.id, "Pancha Paramestis", {
     "reply_markup": {
+      // "inline_keyboard": JSON.stringify([["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]]}
       "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]],
-      // one_time_keyboard: true,
-      resize_keyboard: true
+      one_time_keyboard: true,
+      // resize_keyboard: true
     }
   });
 });
@@ -416,7 +471,11 @@ bot.on('message', (msg) => {
       break;
   }
   if (send_msg) {
-    bot.sendMessage(chatId, rmsg, {reply_to_message_id: msg.message_id})
+    bot.sendMessage(chatId, rmsg,
+      {
+        reply_to_message_id: msg.message_id
+      }
+    )
     // return
   }
   if (send_audio) {

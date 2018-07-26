@@ -1,0 +1,140 @@
+{
+    "/help": "*Jai Jinendra* \n\nI can help you find some of the answers related to *DJSangh*. \n\nYou can control me by sending these commands: \n\n  /classes - show swadhay classes.\n  /events - show upcoming events. \n  /initiatives - show initiatives group members are associated with. \n  /improvebot - join the BotDev group to help improve it's abilities. \n  /tithi - show today's tithi",
+    "/events": [
+        {
+            "text": "Religious",
+            "callback_data": "religious"
+        },
+        {
+            "text": "Social",
+            "callback_data": "social"
+        }
+    ],
+    "religious": [
+        {
+            "text": "Ashtanika Parva",
+            "callback_data": "ashtanika"
+        }
+    ],
+    "ashtanika": [
+        {
+            "text": "Date & Pooja Details",
+            "callback_data": "Ashtanika Details"
+        }
+    ],
+    "_Ashtanika Details": "During this time celestial beings go to the Nandishwar dweep to do puja of Jinendra Bhagwaan.",
+    "Ashtanika Details": "Ashtanika Parva from July 19 thru 27, 2018.\n\n During this time celestial beings go to the Nandishwar dweep to do puja of Jinendra Bhagwaan. We human beings cannot go there, so we all go to our temple and do the puja at our temples. \n\nThis year we will do the NandishwarDweep Vidhaan during the Ashtanika Parva. \n\nThe vidhaan pooja will start after Jinendra Abhishek at 7 AM. \n\nPlease plan to take dharam laabh and confirm your attendance by signing your name on the sign-up sheet at the temple. We will need volunteers to prepare for the vidhaan puja thalis etc., so please also sign-up for the same. \n\n*Vidhaan schedule:* \nDates: July 19 to July 27. \n\nWeekdays: \nVidhaan puja 6:30 AM to  8:30 AM \nWeekends: (July 21 and 22) \nVidhaan puja 7:30 AM to  10:00 AM \n\nP.S. In case Vidhaan is not completed, on the last day Friday July 27, we may continue beyond 8:30 AM.",
+    "/initiatives": [
+        [
+            {
+                "text": "Arham Yoga",
+                "callback_data": "arham_yoga"
+            },
+            {
+                "text": "Bhakthi",
+                "callback_data": "bhakthi"
+            },
+            {
+                "text": "Hathkargha",
+                "callback_data": "hathkargha"
+            }
+        ],
+        [
+            {
+                "text": "Kind Milk",
+                "callback_data": "kindmilk"
+            },
+            {
+                "text": "Stories",
+                "callback_data": "stories"
+            },
+            {
+                "text": "Vidhyanjali",
+                "callback_data": "vidhyanjali"
+            }
+        ]
+    ],
+    "arham_yoga": "To know more or join to Arham Yoga classes, please Contact: charu ji.",
+    "bhakthi": [
+        [
+            {
+                "text": "Timings",
+                "callback_data": "bhakthi_about"
+            },
+            {
+                "text": "Contact",
+                "callback_data": "bhakthi_contact"
+            }
+        ],
+        [
+            {
+                "text": "Jina Bhakthi Geeta",
+                "callback_data": "jbg_group"
+            }
+        ]
+    ],
+    "bhakthi_about": "Bhakthi Timings:\n   Every (almost every!) Thursdays' 8 PM to 9 PM.",
+    "bhakthi_contact": "To know more or to join Thursday's Bhakthi, please Contact: bhumika ji or surbhi ji.",
+    "jbg_group": "*Jina Bhakthi Geete:*\n To share and/or listen to Jina Bhakthi Geete / Jain Devotional Songs, join telegram app group: https://t.me/joinchat/I4W0OxFWDFDpW4Nbhe-eAg.",
+    "/classes": [
+        {
+            "text": "Weekday",
+            "callback_data": "weekday_classes"
+        },
+        {
+            "text": "Weekend",
+            "callback_data": "weekend_classes"
+        }
+    ],
+    "weekday_classes": [
+        {
+            "text": "Cha-dhal Morning Classes",
+            "callback_data": "chadhal_morning"
+        },
+        {
+            "text": "Cha-dhal Evening Classes",
+            "callback_data": "chadhal_evening"
+        }
+    ],
+    "weekend_classes": [
+        {
+            "text": "Sunday at Temple",
+            "callback_data": "sunday_swadhya_at_temple"
+        },
+        {
+            "text": "Sunday online",
+            "callback_data": "sunday_swadhya_online"
+        }
+    ],
+    "sunday_swadhya_online": "Sunday Swadhya Online class: Here are instructions to join swadhyaya: https: //sites.google.com/view/weekly-swadhyaya/home?authuser=0.\n To know more details, contact Shrish ji or Nikita ji.",
+    "sunday_swadhya_at_temple": "For Sunday Swadhya class at temple, please Contact: Parag ji or Ruchi ji for details.",
+    "hathkargha": "To know more about Hathkargha, please Contact: Charu ji, Ruchi ji or Gourav ji for details.",
+    "kindmilk": [
+        {
+            "text": "About",
+            "callback_data": "kindmilk_about"
+        },
+        {
+            "text": "Contact",
+            "callback_data": "kindmilk_contact"
+        }
+    ],
+    "kindmilk_contact": "To know more about Kind Milk project, please Contact: parag ji or shaily ji for details.",
+    "stories": [
+        [
+            {
+                "text": "Kids Animated",
+                "callback_data": "stories_kids_animated"
+            }
+        ],
+        [
+            {
+                "text": "Sponsor",
+                "callback_data": "stories_sponsor"
+            }
+        ]
+    ],
+    "stories_kids_animated": "[Kids section - Know Jainism through Stories - Playlist](https://www.youtube.com/watch?v=HFtSMNrMeyQ&list=PLojk56IbG34w_f95WzPY0m51LE_Z2gSKU).",
+    "stories_sponsor": "Contact shrish ji or preeti ji for details.",
+    "vidhyanjali": "Vidhyanjali:\n Video: https: //youtu.be/4t-kxa38KG4.\n\n To know more details, contact charu ji or ruchi ji."
+}
