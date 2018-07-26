@@ -29,170 +29,21 @@ try {
   console.log("cron pattern not valid");
 };
 
-function _get_contents(cur_topic) {
-  console.log("Current topic: " + cur_topic)
-  var topics = [];
-  var send_msg = 0
-  var new_msg = ""
-
-  if (cur_topic == '/events') topics = [
-    { text: "Religious", callback_data: "religious" },
-    { text: "Social", callback_data: "social" }
-  ]
-  if (cur_topic == 'religious') topics = [
-    { text: "Ashtanika Parva", callback_data: "ashtanika" }
-  ]
-  if (cur_topic == 'ashtanika') topics = [
-    { text: "Date & Pooja Details", callback_data: "Ashtanika Details:" },
-  ]
-  if (cur_topic == 'Ashtanika Details:') {
-    send_msg = 1;
-    new_msg = `
-    Ashtanika Parva from July 19 thru 27, 2018.
-    
-    During this time celestial beings go to the Nandishwar dweep to do puja of Jinendra Bhagwaan. We human beings cannot go there, so we all go to our temple and do the puja at our temples.
-
-    This year we will do the NandishwarDweep Vidhaan during the Ashtanika Parva.
-
-    The vidhaan pooja will start after Jinendra Abhishek at 7 AM.
-
-    Please plan to take dharam laabh and confirm your attendance by signing your name on the sign-up sheet at the temple. We will need volunteers to prepare for the vidhaan puja thalis etc., so please also sign-up for the same.
-
-    Vidhaan schedule:
-    Dates: July 19 to July 27.
-
-    Weekdays:
-    Vidhaan puja 6:30 AM to  8:30 AM
-    Weekends: (July 21 and 22)
-    Vidhaan puja 7:30 AM to  10:00 AM
-
-    P.S. In case Vidhaan is not completed, on the last day Friday July 27, we may continue beyond 8:30 AM.`
-  }
-  if (cur_topic == '/initiatives') topics = [
-    [
-      { text: "Arham Yoga", callback_data: "arham_yoga" },
-      { text: "Bhakthi", callback_data: "bhakthi" },
-    ], [
-      { text: "Hathkargha", callback_data: "hathkargha" },
-      { text: "Kind Milk", callback_data: "kindmilk" },
-      { text: "Vidhyanjali", callback_data: "vidhyanjali" }
-    ]
-  ]
-  if (cur_topic == 'arham_yoga') {
-    send_msg = 1
-    new_msg = "To know more or join to Arham Yoga classes, please Contact: charu ji."
-  }
-  if (cur_topic == 'bhakthi') {
-    topics = [[
-      { text: "Timings", callback_data: "bhakthi_about" },
-      { text: "Contact", callback_data: "bhakthi_contact" }
-    ], [
-      { text: "Jina Bhakthi Geeta", callback_data: "jbg_group" }
-    ]]
-  }
-  if (cur_topic == 'bhakthi_about') {
-    send_msg = 1
-    new_msg = `
-Bhakthi Timings:
-    Every (almost every!) Thursdays' 8 PM to 9 PM.
-    `
-  }
-  if (cur_topic == 'bhakthi_contact') {
-    send_msg = 1
-    new_msg = "To know more or to join Thursday's Bhakthi, please Contact: bhumika ji or surbhi ji."
-  }
-  if (cur_topic == 'jbg_group') {
-    send_msg = 1
-    new_msg = `
-Jina Bhakthi Geete:
-To share and/or listen to Jina Bhakthi Geete / Jain Devotional Songs, join telegram app group: https://t.me/joinchat/I4W0OxFWDFDpW4Nbhe-eAg.
-`
-  }
-  if (cur_topic == '/classes') topics = [
-    { text: "Weekday", callback_data: "weekday_classes" },
-    { text: "Weekend", callback_data: "weekend_classes" }
-  ]
-  if (cur_topic == 'weekday_classes') topics = [
-    { text: "Cha-dhal Morning Classes", callback_data: "chadhal_morning" },
-    { text: "Cha-dhal Evening Classes", callback_data: "chadhal_evening" }
-  ]
-  if (cur_topic == 'weekend_classes') topics = [
-    { text: "Sunday at Temple", callback_data: "sunday_swadhya_at_temple" },
-    { text: "Sunday online", callback_data: "sunday_swadhya_online" },
-  ]
-  if (cur_topic == 'sunday_swadhya_online') {
-    send_msg = 1
-    new_msg = `
-Sunday Swadhya Online class:
-Here are instructions to join swadhyaya: https://sites.google.com/view/weekly-swadhyaya/home?authuser=0.
-To know more details, contact Shrish ji or Nikita ji.
-`
-  }
-  if (cur_topic == 'sunday_swadhya_at_temple') {
-    send_msg = 1
-    new_msg = "For Sunday Swadhya class at temple, please Contact: Parag ji or Ruchi ji for details."
-  }
-  if (cur_topic == 'hathkargha') {
-    send_msg = 1
-    new_msg = "To know more about Hathkargha, please Contact: Charu ji, Ruchi ji or Gourav ji for details."
-  }
-  if (cur_topic == 'kindmilk') topics = [
-    { text: "About", callback_data: "kindmilk_about" },
-    { text: "Contact", callback_data: "kindmilk_contact" }
-  ]
-  if (cur_topic == 'kindmilk_contact') {
-    send_msg = 1
-    new_msg = "To know more about Kind Milk project, please Contact: parag ji or shaily ji for details."
-  }
-  if (cur_topic == 'vidhyanjali') {
-    send_msg = 1
-    new_msg = `
-Vidhyanjali:
-
-Video: https://youtu.be/4t-kxa38KG4.
-
-To know more details, contact charu ji.
-`
-  }
-  console.log("Send msg", send_msg)
-  if (send_msg == 0 || new_msg.length == 0) {
-    var json_data = {}
-    if (topics.length != 0) {
-      if (Object.prototype.toString.call(topics[0]) == '[object Object]') {
-        topics = [topics]
-      }
-      json_data = {
-        inline_keyboard: topics
-      }
-      console.log("JSON data: ", json_data)
-      return [send_msg, {
-        reply_markup: JSON.stringify(
-          json_data
-        )
-      }];
-    } else {
-      send_msg = 1;
-      new_msg = " I don't have any details of '" + cur_topic +
-        "' yet. Please check with group for the details."
-    }
-  }
-  console.log("Message: ", new_msg)
-  return [send_msg, new_msg]
-}
-
 function get_contents(cur_topic) {
   console.log("Current topic: " + cur_topic)
-  // var topics = [];
   var topics
   var send_msg = 0
   var new_msg = ""
 
-  console.log("topics from getData before: ", topics)
   topics = myData.getData(cur_topic)
   console.log("topics from getData: ", topics)
 
   console.log(Object.prototype.toString.call(topics))
-  if (Object.prototype.toString.call(topics) == '[object String]') {
+  if (Object.prototype.toString.call(topics) == '[object Undefined]') {
+    send_msg = 1;
+    new_msg = " I don't have any details of '" + cur_topic +
+      "' yet. Please check with the group for the details."
+  } else if (Object.prototype.toString.call(topics) == '[object String]') {
     send_msg = 1
     new_msg = topics
   }
@@ -239,22 +90,7 @@ function runCmd(msg) {
 }
 
 bot.onText(/\/help|\/start/, (msg) => {
-  msgdata = `
-*Jai Jinendra*
-
-I can help you find some of the answers related to *DJSangh*.
-
-You can control me by sending these commands: 
-
-  /classes - show swadhay classes.
-  /events - show upcoming events.
-  /initiatives - show initiatives group members are associated with.
-  /improvebot - join the BotDev group to help improve it's abilities.
-  /tithi - show today's tithi
-`
   msgdata = myData.getData("/help")
-
-  console.log("Message: %v", msg)
   bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
@@ -263,17 +99,8 @@ You can control me by sending these commands:
 });
 
 bot.onText(/\/improvebot/, (msg) => {
-  msgdata =
-    `
-Appreciate your interest in improving this Bot 👍. 
-Join [DJSanghBotDev](https://t.me/joinchat/I4W0Ow9J37gDlkn0VRRlyw) group to share your insights in improving the bot.
-`
-
-  bot.sendMessage(msg.chat.id, msgdata,
-    {
-      parse_mode: "Markdown"
-    }
-  ).catch((error) => {
+  msgdata = myData.getData("/improvebot")
+  bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown" }).catch((error) => {
     console.log(error.code);  // => 'ETELEGRAM'
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
