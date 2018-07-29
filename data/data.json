@@ -1,5 +1,5 @@
 {
-    "/help": "*Jai Jinendra* \n\nI can help you find some of the answers related to *DJSangh*. \n\nYou can control me by sending these commands: \n\n  /classes - show swadhay classes.\n  /events - show upcoming events. \n  /initiatives - show initiatives group members are associated with. \n  /improvebot - join the BotDev group to help improve it's abilities. \n  /tithi - show today's tithi",
+    "/start": "*Jai Jinendra* \n\nI can help you find some of the answers related to *DJSangh*. \n\nYou can control me by sending these commands: \n\n  /classes - show swadhay classes.\n  /events - show upcoming events. \n  /initiatives - show initiatives group members are associated with. \n  /improvebot - join the BotDev group to help improve it's abilities. \n  /tithi - show today's tithi",
     "/improvebot": "Appreciate your interest in improving this Bot 👍. \nJoin [DJSanghBotDev](https://t.me/joinchat/I4W0Ow9J37gDlkn0VRRlyw) group to share your insights in improving the bot.",    
     "/events": [
         {

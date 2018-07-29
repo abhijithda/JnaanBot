@@ -3,6 +3,7 @@ const myConfig = require('./config');
 // const token = '${TELEGRAM_BOT_TOKEN}';
 const token = myConfig.token()
 const myData = require('./getdata')
+const myURL = myConfig.data_URL()
 
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
@@ -29,13 +30,13 @@ try {
   console.log("cron pattern not valid");
 };
 
-function get_contents(cur_topic) {
+async function get_contents(cur_topic) {
   console.log("Current topic: " + cur_topic)
   var topics
   var send_msg = 0
   var new_msg = ""
 
-  topics = myData.getData(cur_topic)
+  topics = await myData.getData(myURL, cur_topic)
   console.log("topics from getData: ", topics)
 
   console.log(Object.prototype.toString.call(topics))
@@ -74,55 +75,40 @@ function get_contents(cur_topic) {
   return [send_msg, new_msg]
 }
 
-function runCmd(msg) {
+async function runCmd(msg) {
   var msgTxt = msg.text.split("@")
   var cmd = msgTxt[0]
   console.log("Running command: ", cmd)
-  var resp = get_contents(cmd)
+  var resp = await get_contents(cmd)
   send_msg = resp[0]
+  console.log("Send message?: ", send_msg)
   msgdata = resp[1]
   console.log("Command result: ", msgdata)
-  bot.sendMessage(msg.chat.id, msg.text, msgdata).catch((error) => {
-    console.log(error.code);  // => 'ETELEGRAM'
-    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-    bot.sendMessage(chatId, error.response.body.description)
-  });
+  if (Object.prototype.toString.call(msgdata) == '[object String]') {
+    bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
+      console.log(error.code);  // => 'ETELEGRAM'
+      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      bot.sendMessage(chatId, error.response.body.description)
+    });
+  }
+  else {
+    bot.sendMessage(msg.chat.id, msg.text, msgdata).catch((error) => {
+      console.log(error.code);  // => 'ETELEGRAM'
+      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      bot.sendMessage(chatId, error.response.body.description)
+    });
+  }
 }
 
-bot.onText(/\/help|\/start/, (msg) => {
-  msgdata = myData.getData("/help")
-  bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
-    console.log(error.code);  // => 'ETELEGRAM'
-    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-    bot.sendMessage(chatId, error.response.body.description)
-  });
+bot.onText(/\/.*/, (cmd) => {
+  runCmd(cmd)
 });
 
-bot.onText(/\/improvebot/, (msg) => {
-  msgdata = myData.getData("/improvebot")
-  bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown" }).catch((error) => {
-    console.log(error.code);  // => 'ETELEGRAM'
-    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-    bot.sendMessage(chatId, error.response.body.description)
-  });
-});
 
-bot.onText(/\/events/, (msg) => {
-  runCmd(msg)
-});
-
-bot.onText(/\/classes/, (msg) => {
-  runCmd(msg)
-});
-
-bot.onText(/\/initiatives/, (msg) => {
-  runCmd(msg)
-});
-
-bot.on('callback_query', function (message) {
+bot.on('callback_query', async function (message) {
   console.log("callback_query message: ", message)
   var msg = message.message;
-  var resp = get_contents(message.data)
+  var resp = await get_contents(message.data)
   send_msg = resp[0]
   msgdata = resp[1]
   console.log("callback_query message data: ", msgdata)

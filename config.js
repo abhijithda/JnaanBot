@@ -1,6 +1,6 @@
 module.exports = {
-    token: function () {
-        return process.env.TOKEN
+    data_URL: function () {
+        return process.env.DATA_URL
     },
 
     notify_message: function () {
@@ -21,5 +21,10 @@ module.exports = {
          * By default runs everyday at 5:55:00 AM.
          */
         return process.env.NOTIFY_TIME || '00 55 5 * * *'
+    },
+
+    token: function () {
+        return process.env.TOKEN
     }
+
 }
