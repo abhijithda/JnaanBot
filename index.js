@@ -115,13 +115,8 @@ bot.on('callback_query', async function (message) {
   if (send_msg) {
     msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
 
-     `+ msgdata
-    bot.sendMessage(msg.chat.id, msgdata,
-      {
-        parse_mode: "Markdown",
-        reply_to_message_id: msg.message_id
-      }
-    ).catch((error) => {
+    `+ msgdata
+    bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
