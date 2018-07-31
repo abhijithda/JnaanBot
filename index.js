@@ -23,14 +23,15 @@ try {
     timeZone: 'America/Los_Angeles'
   })
 } catch (ex) {
-  console.log("cron pattern not valid");
+  console.log("cron pattern is not valid");
 };
 
 async function sendEventMessage() {
   var recvs = myConfig.notify_receivers()
 
+  // getMonth returns from 0-11, so add 1.
   var mm = new Date().getMonth() + 1
-  var dd = new Date().getDate() + 1
+  var dd = new Date().getDate()
   var mm_dd = mm + '-' + dd
   var events = await myData.getSchedule(schedule_URL, mm_dd)
   console.log("Scheduled Events: ", events)
