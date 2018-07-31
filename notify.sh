@@ -5,6 +5,7 @@ LC_CTYPE=en_US.UTF-8
 
 receivers=${NOTIFY_RECEIVERS}
 text=${NOTIFY_MESSAGE:-"Jai Jinendra 🙏 !"}
+receivers=${NOTIFY_RECEIVERS}
 token=${TOKEN}
 
 # To get chat ID, first sent msg from that ID, and then click on

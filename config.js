@@ -23,6 +23,10 @@ module.exports = {
         return process.env.NOTIFY_TIME || '00 55 5 * * *'
     },
 
+    schedule_URL: function () {
+        return process.env.SCHEDULE_URL
+    },
+
     token: function () {
         return process.env.TOKEN
     }

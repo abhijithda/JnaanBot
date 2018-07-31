@@ -3,7 +3,8 @@ const myConfig = require('./config');
 // const token = '${TELEGRAM_BOT_TOKEN}';
 const token = myConfig.token()
 const myData = require('./getdata')
-const myURL = myConfig.data_URL()
+const dataURL = myConfig.data_URL()
+const schedule_URL = myConfig.schedule_URL()
 
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
@@ -16,12 +17,7 @@ try {
   var job = new CronJob({
     cronTime: myConfig.notify_time(),
     onTick: function () {
-      recvs = myConfig.notify_receivers()
-      msg = myConfig.notify_message()
-      for (r in recvs) {
-        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-        bot.sendMessage(recvs[r], msg)
-      }
+      msg = sendEventMessage()
     },
     start: true,
     timeZone: 'America/Los_Angeles'
@@ -30,13 +26,31 @@ try {
   console.log("cron pattern not valid");
 };
 
+async function sendEventMessage() {
+  var recvs = myConfig.notify_receivers()
+
+  var mm = new Date().getMonth() + 1
+  var dd = new Date().getDate() + 1
+  var mm_dd = mm + '-' + dd
+  var events = await myData.getSchedule(schedule_URL, mm_dd)
+  console.log("Scheduled Events: ", events)
+
+  for (e in events) {
+    msg = "*" + events[e]["Title"] + "*:\n" + events[e]["Description"]
+    for (r in recvs) {
+      console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+      bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+    }
+  }
+}
+
 async function get_contents(cur_topic) {
   console.log("Current topic: " + cur_topic)
   var topics
   var send_msg = 0
   var new_msg = ""
 
-  topics = await myData.getData(myURL, cur_topic)
+  topics = await myData.getData(dataURL, cur_topic)
   console.log("topics from getData: ", topics)
 
   console.log(Object.prototype.toString.call(topics))
