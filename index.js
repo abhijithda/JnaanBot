@@ -64,7 +64,7 @@ async function get_contents(cur_topic) {
     new_msg = topics
   }
 
-  console.log("Send msg", send_msg)
+  console.log("Send message?:", send_msg)
   if (send_msg == 0 || new_msg.length == 0) {
     var json_data = {}
     if (topics.length != 0) {
@@ -74,7 +74,8 @@ async function get_contents(cur_topic) {
       json_data = {
         inline_keyboard: topics
       }
-      console.log("JSON data: ", json_data)
+      console.log("JSON data: ")
+      console.log(json_data)
       return [send_msg, {
         reply_markup: JSON.stringify(
           json_data
@@ -96,7 +97,6 @@ async function runCmd(msg) {
   console.log("Running command: ", cmd)
   var resp = await get_contents(cmd)
   send_msg = resp[0]
-  console.log("Send message?: ", send_msg)
   msgdata = resp[1]
   console.log("Command result: ", msgdata)
   if (Object.prototype.toString.call(msgdata) == '[object String]') {
@@ -128,10 +128,11 @@ bot.on('callback_query', async function (message) {
   msgdata = resp[1]
   console.log("callback_query message data: ", msgdata)
   if (send_msg) {
-    msgdata = "Providing details to " + message.from.first_name + " (@" + message.from.username + ") " + `
-
-    `+ msgdata
-    bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id }).catch((error) => {
+    msgdata = "_Providing details to " + message.from.first_name + "_ (@" + message.from.username + ") " + `
+    
+`
+    + msgdata
+    bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id, parse_mode: "Markdown" }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
