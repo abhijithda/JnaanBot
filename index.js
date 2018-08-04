@@ -62,16 +62,16 @@ async function get_contents(cur_topic) {
   } else if (Object.prototype.toString.call(topics) == '[object String]') {
     send_msg = 1
     new_msg = topics
-  }
-
-  console.log("Send message?:", send_msg)
-  if (send_msg == 0 || new_msg.length == 0) {
-    var json_data = {}
-    if (topics.length != 0) {
+  } else if (topics.length != 0) {
+    if (Object.prototype.toString.call(topics[0]) == '[object String]') {
+      send_msg = 1
+      new_msg = topics.join("\n")
+    } else if ((Object.prototype.toString.call(topics[0]) == '[object Object]') ||
+      (Object.prototype.toString.call(topics[0]) == '[object Array]')) {
       if (Object.prototype.toString.call(topics[0]) == '[object Object]') {
         topics = [topics]
       }
-      json_data = {
+      var json_data = {
         inline_keyboard: topics
       }
       console.log("JSON data: ")
@@ -81,12 +81,9 @@ async function get_contents(cur_topic) {
           json_data
         )
       }];
-    } else {
-      send_msg = 1;
-      new_msg = " I don't have any details of '" + cur_topic +
-        "' yet. Please check with group for the details."
     }
   }
+
   console.log("Message: ", new_msg)
   return [send_msg, new_msg]
 }
@@ -131,7 +128,7 @@ bot.on('callback_query', async function (message) {
     msgdata = "_Providing details to " + message.from.first_name + "_ (@" + message.from.username + ") " + `
     
 `
-    + msgdata
+      + msgdata
     bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id, parse_mode: "Markdown" }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
