@@ -4,7 +4,8 @@ const myConfig = require('./config');
 const token = myConfig.token()
 const myData = require('./getdata')
 const dataURL = myConfig.data_URL()
-const schedule_URL = myConfig.schedule_URL()
+const calender_lunar_URL = myConfig.calender_lunar_URL()
+const calender_solar_URL = myConfig.calender_solar_URL()
 
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
@@ -33,11 +34,22 @@ async function sendEventMessage() {
   var mm = new Date().getMonth() + 1
   var dd = new Date().getDate()
   var mm_dd = mm + '-' + dd
-  var events = await myData.getSchedule(schedule_URL, mm_dd)
-  console.log("Scheduled Events: ", events)
-
+  
+  // TODO: Get tithi and pass it to getSchedule().
+  var events = await myData.getSchedule(calender_lunar_URL, mm_dd)
+  // console.log("Lunar Scheduled Events: ", events)
   for (e in events) {
-    msg = "*" + events[e]["Title"] + "*:\n" + events[e]["Description"]
+    msg = mm_dd + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
+    for (r in recvs) {
+      console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+      bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+    }
+  }
+
+  var events = await myData.getSchedule(calender_solar_URL, mm_dd)
+  // console.log("Solar Scheduled Events: ", events)
+  for (e in events) {
+    msg = mm_dd + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
     for (r in recvs) {
       console.log("Sending notification message " + msg + " to reciever " + recvs[r])
       bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })

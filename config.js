@@ -23,8 +23,12 @@ module.exports = {
         return process.env.NOTIFY_TIME || '00 55 5 * * *'
     },
 
-    schedule_URL: function () {
-        return process.env.SCHEDULE_URL
+    calender_lunar_URL: function () {
+        return process.env.CALENDER_LUNAR_URL
+    },
+
+    calender_solar_URL: function () {
+        return process.env.CALENDER_SOLAR_URL
     },
 
     token: function () {

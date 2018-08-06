@@ -10,11 +10,11 @@ Set the following environmnet variables
 
 ```bash
 DATA_URL="<url containing json data>"
+CALENDER_LUNAR_URL="<url containing lunar calender events data>"
+CALENDER_SOLAR_URL="<url containing solar calender events data>"
 NOTIFY_TIME="<Time at which notification should be sent>"
 NOTIFY_MESSAGE="<Message to be notified>"
-NOTIFY_RECEIVERS="<Recepients to be notified>"
-RECEIVERS="<receiver1>, <receiver2>, ... <receiverN>"
-SCHEDULE_URL="<url containing schedule data>"
+NOTIFY_RECEIVERS="<Recepients to be notified>" # Ex: "receiver1,receiver2,receiverN"
 # replace the value below with the Telegram token you receive from @BotFather
 TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
 ```

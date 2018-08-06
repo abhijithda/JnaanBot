@@ -7,7 +7,7 @@ module.exports = {
         let response = await fetch(url);
         let data = await response.json();
         // console.log(data)
-        console.log("Getting data for ...", topic)
+        console.log("Getting data from %s for %s...", url, topic)
         console.log(data[topic])
 
         return data[topic];
@@ -19,7 +19,7 @@ module.exports = {
         let response = await fetch(url);
         let data = await response.json();
         // console.log(data)
-        console.log("Getting schedule for ...", mm_dd)
+        console.log("Getting calender schedule from %s for %s...", url, mm_dd)
         console.log(data[mm_dd])
 
         return data[mm_dd];
