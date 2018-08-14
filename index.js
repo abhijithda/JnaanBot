@@ -30,11 +30,12 @@ try {
 async function sendEventMessage() {
   var recvs = myConfig.notify_receivers()
 
-  sendLunarCalenderEvent(recvs)
+  sendLunarCalenderEvent(recvs, 1)
   sendSolarCalenderEvent(recvs)
 }
 
-function sendLunarCalenderEvent(recvs) {
+// Implements Tithi command and also sends out notifications based on tithi from the cron job.
+function sendLunarCalenderEvent(recvs, cron) {
   var http = require('http');
   console.log("Entering sendLunarCalenderEvent() to ...", recvs)
 
@@ -48,7 +49,7 @@ function sendLunarCalenderEvent(recvs) {
     res.on('data', function (chunk) {
       data += chunk;
     });
-    res.on('end', function () {
+    res.on('end', async function () {
       // console.log(data);
       var xpath = require('xpath')
         , dom = require('xmldom').DOMParser
@@ -56,32 +57,100 @@ function sendLunarCalenderEvent(recvs) {
 
       // console.log(nodes[0].localName + ": " + nodes[0].firstChild.data)
       // console.log("Node: " + nodes[0].toString())
-      var masa = "", paksha = "", tithi = "", day = ""
+      var masa = "", paksha = "", tithi = -1, day = ""
       var masa_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[2]", doc)
       masa = masa_nodes[0].firstChild.data
       console.log("Masa:", masa)
 
       var paksha_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[3]/td[2]", doc)
       paksha = paksha_nodes[0].firstChild.data
+      paksha = paksha.split(" ")[0]
       console.log("Paksha:", paksha)
 
       var tithi_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[4]/td[2]", doc)
-      tithi = tithi_nodes[0].firstChild.data
+      tithi_name = tithi_nodes[0].firstChild.data
+      tithi_name = tithi_name.split(" ")[0]
+      switch (tithi_name) {
+        case "Pratipada":
+          tithi = 1
+          break;
+        case "Dwitiya":
+          tithi = 2
+          break;
+        case "Tritiya":
+          tithi = 3
+          break;
+        case "Chaturthi":
+          tithi = 4
+          break;
+        case "Panchami":
+          tithi = 5
+          break;
+        case "Shashthi":
+          tithi = 6
+          break;
+        case "Saptami":
+          tithi = 7
+          break;
+        case "Ashtami":
+          tithi = 8
+          break;
+        case "Navami":
+          tithi = 9
+          break;
+        case "Dashami":
+          tithi = 10
+          break;
+        case "Ekadashi":
+          tithi = 11
+          break;
+        case "Dwadashi":
+          tithi = 12
+          break;
+        case "Trayodashi":
+          tithi = 13
+          break;
+        case "Chaturdashi":
+          tithi = 14
+          break;
+        case "Purnima":
+          tithi = 15
+          break;
+        default:
+          console.log("Not registered tithi found:", tithi_name)
+          break;
+      }
       console.log("Tithi:", tithi)
 
-      day = masa + ' ' + paksha.split(" ")[0] + ' ' + tithi.split(" ")[0]
+      day = masa + '-' + paksha + '-' + tithi
       console.log("Day:", day)
 
-      // var events = await myData.getSchedule(calender_lunar_URL, day)
-      // // console.log("Lunar Scheduled Events: ", events)
-      // for (e in events) {
-      //   msg = day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
-      msg = day
-      for (r in recvs) {
-        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-        bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+      var msgs = []
+      var events = await myData.getSchedule(calender_lunar_URL, day)
+      if (cron) {
+        if (events.length == 0) {
+          console.log("No events present.")
+          return 0
+        }
+      } else {
+        console.log("Sending today's masa, paksha and tithi details for /tithi command...")
+        msgs.push('*' + day + '*')
       }
-      // }
+
+      // For `/tithi`: Send any events along with tithi info for the command...
+      // For Cron: Send event details if any...
+      console.log("Lunar Scheduled Events: ", events)
+      for (e in events) {
+        msgs.push(day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+      }
+
+      for (m in msgs) {
+        for (r in recvs) {
+          var msg = msgs[m]
+          console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+          bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+        }
+      }
     });
   });
 
@@ -244,7 +313,6 @@ bot.onText(/\/get_month/, (msg) => {
     case 1:
       mm = "January";
       break;
-      break;
     case 2:
       mm = "February";
       break;
@@ -314,7 +382,7 @@ bot.onText(/\/tithi/, (msg) => {
   // 'msg' is the received Message from Telegram
   console.log("Sending lunar calender info...")
   recvs = [msg.chat.id]
-  sendLunarCalenderEvent(recvs)
+  sendLunarCalenderEvent(recvs, 0)
 });
 
 
