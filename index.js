@@ -30,21 +30,73 @@ try {
 async function sendEventMessage() {
   var recvs = myConfig.notify_receivers()
 
+  sendLunarCalenderEvent(recvs)
+  sendSolarCalenderEvent(recvs)
+}
+
+function sendLunarCalenderEvent(recvs) {
+  var http = require('http');
+  console.log("Entering sendLunarCalenderEvent() to ...", recvs)
+
+  var options = {
+    host: 'panchangam.org',
+    path: '/'
+  }
+
+  var request = http.request(options, function (res) {
+    var data = '';
+    res.on('data', function (chunk) {
+      data += chunk;
+    });
+    res.on('end', function () {
+      // console.log(data);
+      var xpath = require('xpath')
+        , dom = require('xmldom').DOMParser
+      var doc = new dom().parseFromString(data)
+
+      // console.log(nodes[0].localName + ": " + nodes[0].firstChild.data)
+      // console.log("Node: " + nodes[0].toString())
+      var masa = "", paksha = "", tithi = "", day = ""
+      var masa_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[2]", doc)
+      masa = masa_nodes[0].firstChild.data
+      console.log("Masa:", masa)
+
+      var paksha_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[3]/td[2]", doc)
+      paksha = paksha_nodes[0].firstChild.data
+      console.log("Paksha:", paksha)
+
+      var tithi_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[4]/td[2]", doc)
+      tithi = tithi_nodes[0].firstChild.data
+      console.log("Tithi:", tithi)
+
+      day = masa + ' ' + paksha.split(" ")[0] + ' ' + tithi.split(" ")[0]
+      console.log("Day:", day)
+
+      // var events = await myData.getSchedule(calender_lunar_URL, day)
+      // // console.log("Lunar Scheduled Events: ", events)
+      // for (e in events) {
+      //   msg = day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
+      msg = day
+      for (r in recvs) {
+        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+        bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+      }
+      // }
+    });
+  });
+
+  request.on('error', function (e) {
+    console.log(e.message);
+  });
+  request.end();
+}
+
+
+async function sendSolarCalenderEvent(recvs) {
   // getMonth returns from 0-11, so add 1.
   var mm = new Date().getMonth() + 1
   var dd = new Date().getDate()
   var mm_dd = mm + '-' + dd
-  
-  // TODO: Get tithi and pass it to getSchedule().
-  var events = await myData.getSchedule(calender_lunar_URL, mm_dd)
-  // console.log("Lunar Scheduled Events: ", events)
-  for (e in events) {
-    msg = mm_dd + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
-    for (r in recvs) {
-      console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-      bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
-    }
-  }
 
   var events = await myData.getSchedule(calender_solar_URL, mm_dd)
   // console.log("Solar Scheduled Events: ", events)
@@ -260,8 +312,9 @@ bot.onText(/\/get_day/, (msg) => {
 
 bot.onText(/\/tithi/, (msg) => {
   // 'msg' is the received Message from Telegram
-  const chatId = msg.chat.id;
-  bot.sendMessage(chatId, "To Be Implemented! Need to gather data!!");
+  console.log("Sending lunar calender info...")
+  recvs = [msg.chat.id]
+  sendLunarCalenderEvent(recvs)
 });
 
 
