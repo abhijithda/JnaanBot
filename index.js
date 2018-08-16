@@ -113,6 +113,7 @@ function sendLunarCalenderEvent(recvs, cron) {
         case "Chaturdashi":
           tithi = 14
           break;
+        case "Amavasya":
         case "Purnima":
           tithi = 15
           break;
@@ -134,7 +135,7 @@ function sendLunarCalenderEvent(recvs, cron) {
         }
       } else {
         console.log("Sending today's masa, paksha and tithi details for /tithi command...")
-        msgs.push('*' + day + '*')
+        msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi + '*')
       }
 
       // For `/tithi`: Send any events along with tithi info for the command...
@@ -148,7 +149,11 @@ function sendLunarCalenderEvent(recvs, cron) {
         for (r in recvs) {
           var msg = msgs[m]
           console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-          bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+          bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
+            console.log(error.code);  // => 'ETELEGRAM'
+            console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+            // bot.sendMessage(msg.chat.id, error.response.body.description)
+          });
         }
       }
     });
@@ -173,7 +178,11 @@ async function sendSolarCalenderEvent(recvs) {
     msg = mm_dd + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"]
     for (r in recvs) {
       console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-      bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" })
+      bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
+        console.log(error.code);  // => 'ETELEGRAM'
+        console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        // bot.sendMessage(msg.chat.id, error.response.body.description)
+      });
     }
   }
 }
@@ -229,18 +238,23 @@ async function runCmd(msg) {
   send_msg = resp[0]
   msgdata = resp[1]
   console.log("Command result: ", msgdata)
+
   if (Object.prototype.toString.call(msgdata) == '[object String]') {
+    if (msgdata.length == 0) {
+      // console.log("No data available to send for %s from %s!", cmd, dataURL)
+      return
+    }
     bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-      bot.sendMessage(chatId, error.response.body.description)
+      bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   }
   else {
     bot.sendMessage(msg.chat.id, msg.text, msgdata).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-      bot.sendMessage(chatId, error.response.body.description)
+      bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   }
 }
@@ -265,7 +279,7 @@ bot.on('callback_query', async function (message) {
     bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id, parse_mode: "Markdown" }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-      bot.sendMessage(chatId, error.response.body.description)
+      bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   } else {
     var editOptions = Object.assign({}, msgdata, { chat_id: msg.chat.id, message_id: msg.message_id });
