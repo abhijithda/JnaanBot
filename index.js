@@ -305,6 +305,11 @@ bot.onText(/\/leave_group/, (msg) => {
     console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
   });
+  bot.unbanChatMember(chatId, msg.from.id).catch((error) => {
+    console.log(error.code);  // => 'ETELEGRAM'
+    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(chatId, error.response.body.description)
+  });
 });
 
 
@@ -407,43 +412,63 @@ bot.on('message', (msg) => {
 
   var send_msg = 1
   var send_audio = 0
-  switch (msg.text.toString().toLowerCase()) {
-    // Greetings here...
-    case "hi":
-    case "hello":
-    case "jj":
-    case "jai jinendra":
-      rmsg = "Jai Jinendra 🙏"
-      break;
+  console.log("Checking for new members: ", msg.new_chat_members)
+  if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
+    for (m in msg.new_chat_members) {
+      rmsg = "*Jai Jinendra* 🙏 " + msg.new_chat_members[m].first_name + "(@" + 
+        msg.new_chat_members[m].username + ")! \n\nWelcome to the group."
+      rmsg += "\n\nThis group is for social and religious talks!"
+      rmsg += "\nPS> Notifications may be muted for you. To receive notifications, click on the group name, and press unmute button."
+    }
+    send_msg = 1
+  }
 
-    case "bye":
-    case "ciao":
-    case "see you":
-      rmsg = "Hope to see you around again, Bye"
-      break;
+  if (Object.prototype.toString.call(msg.text) != '[object Undefined]') {
+    switch (msg.text.toString().toLowerCase()) {
+      // Greetings here...
+      case "hi":
+      case "hello":
+      case "jj":
+      case "jai jinendra":
+        rmsg = "Jai Jinendra 🙏"
+        break;
 
-    case "thanks":
-    case "thank you":
-      rmsg = "My pleasure 👍"
-      break;
+      case "bye":
+      case "ciao":
+      case "see you":
+        rmsg = "Hope to see you around again, Bye"
+        break;
 
-    case "leave group":
-      rmsg = "Do you want to leave group? click here: /leave_group."
-      break;
-    case "play song":
-      send_audio = 1
-      send_msg = 0
-      break
-    default:
-      send_msg = 0
-      break;
+      case "thanks":
+      case "thank you":
+        rmsg = "My pleasure 👍"
+        break;
+
+      case "leave group":
+        rmsg = "Do you want to leave group? click here: /leave_group."
+        break;
+      case "play song":
+        send_audio = 1
+        send_msg = 0
+        break
+      default:
+        send_msg = 0
+        break;
+    }
   }
   if (send_msg) {
+    console.log("Sending message: ", rmsg)
     bot.sendMessage(chatId, rmsg,
       {
-        reply_to_message_id: msg.message_id
+        reply_to_message_id: msg.message_id, parse_mode: "Markdown"
       }
-    )
+    ).catch((error) => {
+        console.log(error.code);  // => 'ETELEGRAM'
+        console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        // bot.sendMessage(msg.chat.id, error.response.body.description)
+      }
+    );
+    send_msg = 0
     // return
   }
   if (send_audio) {
