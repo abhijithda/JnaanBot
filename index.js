@@ -411,16 +411,16 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
 
   var send_msg = 1
+  var welcome_msg = 0
   var send_audio = 0
   console.log("Checking for new members: ", msg.new_chat_members)
   if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
     for (m in msg.new_chat_members) {
-      rmsg = "*Jai Jinendra* 🙏 " + msg.new_chat_members[m].first_name + "(@" + 
-        msg.new_chat_members[m].username + ")! \n\nWelcome to the group."
-      rmsg += "\n\nThis group is for social and religious talks!"
-      rmsg += "\nPS> Notifications may be muted for you. To receive notifications, click on the group name, and press unmute button."
+      rmsg = "*Jai Jinendra* 🙏 " + msg.new_chat_members[m].first_name + "(@" +
+        msg.new_chat_members[m].username + ")!"
     }
     send_msg = 1
+    welcome_msg = 1
   }
 
   if (Object.prototype.toString.call(msg.text) != '[object Undefined]') {
@@ -458,17 +458,20 @@ bot.on('message', (msg) => {
   }
   if (send_msg) {
     console.log("Sending message: ", rmsg)
-    bot.sendMessage(chatId, rmsg,
-      {
-        reply_to_message_id: msg.message_id, parse_mode: "Markdown"
-      }
-    ).catch((error) => {
-        console.log(error.code);  // => 'ETELEGRAM'
-        console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-        // bot.sendMessage(msg.chat.id, error.response.body.description)
-      }
-    );
+    bot.sendMessage(chatId, rmsg, {
+      reply_to_message_id: msg.message_id, parse_mode: "Markdown"
+    }).catch((error) => {
+      console.log(error.code);  // => 'ETELEGRAM'
+      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      // bot.sendMessage(msg.chat.id, error.response.body.description)
+    });
     send_msg = 0
+    if (welcome_msg) {
+      msg.text = "/welcome"
+      runCmd(msg)
+      msg.text = ""
+      welcome_msg = 0
+    }
     // return
   }
   if (send_audio) {
