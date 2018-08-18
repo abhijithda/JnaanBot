@@ -194,7 +194,7 @@ async function get_contents(cur_topic) {
   var new_msg = ""
 
   topics = await myData.getData(dataURL, cur_topic)
-  console.log("topics from getData: ", topics)
+  // console.log("topics from getData: ", topics)
 
   console.log(Object.prototype.toString.call(topics))
   if (Object.prototype.toString.call(topics) == '[object Undefined]') {
@@ -226,7 +226,7 @@ async function get_contents(cur_topic) {
     }
   }
 
-  console.log("Message: ", new_msg)
+  // console.log("Message: ", new_msg)
   return [send_msg, new_msg]
 }
 
@@ -408,20 +408,32 @@ bot.onText(/\/tithi/, (msg) => {
 // Listen for any kind of message. There are different kinds of
 // messages.
 bot.on('message', (msg) => {
+  console.log("Message recieved: ", msg)
   const chatId = msg.chat.id;
 
   var send_msg = 1
   var welcome_msg = 0
   var send_audio = 0
-  console.log("Checking for new members: ", msg.new_chat_members)
+  rmsg = ""
+
   if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
     for (m in msg.new_chat_members) {
-      rmsg = "*Jai Jinendra* 🙏 " + msg.new_chat_members[m].first_name + "(@" +
-        msg.new_chat_members[m].username + ")!"
+      rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
+        msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
+        "(@" + msg.new_chat_members[m].username + ")!"
     }
     send_msg = 1
     welcome_msg = 1
   }
+
+  if (Object.prototype.toString.call(msg.left_chat_member) != '[object Undefined]') {
+    rmsg += "\nMichchhāmi Dukkaḍaṃ 🙏 " +
+      msg.left_chat_member.first_name + " " + msg.left_chat_member.last_name +
+      "(@" + msg.left_chat_member.username + ")!"
+    send_msg = 1
+  }
+
+  console.log("User join/leave message: ", rmsg)
 
   if (Object.prototype.toString.call(msg.text) != '[object Undefined]') {
     switch (msg.text.toString().toLowerCase()) {
@@ -456,7 +468,7 @@ bot.on('message', (msg) => {
         break;
     }
   }
-  if (send_msg) {
+  if (send_msg == 1 && rmsg.length != 0) {
     console.log("Sending message: ", rmsg)
     bot.sendMessage(chatId, rmsg, {
       reply_to_message_id: msg.message_id, parse_mode: "Markdown"
