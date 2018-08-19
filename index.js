@@ -1,3 +1,4 @@
+require("console-stamp")(console)
 const myConfig = require('./config');
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
@@ -475,7 +476,7 @@ bot.on('message', (msg) => {
     }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-      // bot.sendMessage(msg.chat.id, error.response.body.description)
+      bot.sendMessage(chatId, error.response.body.description)
     });
     send_msg = 0
     if (welcome_msg) {
