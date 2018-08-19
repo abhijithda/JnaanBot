@@ -418,6 +418,7 @@ bot.on('message', (msg) => {
   rmsg = ""
 
   if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
+    console.info("New user joined...")
     for (m in msg.new_chat_members) {
       rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
         msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
@@ -428,13 +429,12 @@ bot.on('message', (msg) => {
   }
 
   if (Object.prototype.toString.call(msg.left_chat_member) != '[object Undefined]') {
+    console.info("User left...")
     rmsg += "\nMichchhāmi Dukkaḍaṃ 🙏 " +
       msg.left_chat_member.first_name + " " + msg.left_chat_member.last_name +
       "(@" + msg.left_chat_member.username + ")!"
     send_msg = 1
   }
-
-  console.log("User join/leave message: ", rmsg)
 
   if (Object.prototype.toString.call(msg.text) != '[object Undefined]') {
     switch (msg.text.toString().toLowerCase()) {
@@ -443,7 +443,7 @@ bot.on('message', (msg) => {
       case "hello":
       case "jj":
       case "jai jinendra":
-        rmsg = "Jai Jinendra 🙏"
+        rmsg = "ಜೈ ಜಿನೇಂದ್ರ 🙏 जय जिनेन्द्र 🙏 Jai Jinendra 🙏"
         break;
 
       case "bye":
@@ -470,7 +470,7 @@ bot.on('message', (msg) => {
     }
   }
   if (send_msg == 1 && rmsg.length != 0) {
-    console.log("Sending message: ", rmsg)
+    console.info("Sending message: ", rmsg)
     bot.sendMessage(chatId, rmsg, {
       reply_to_message_id: msg.message_id, parse_mode: "Markdown"
     }).catch((error) => {
