@@ -70,8 +70,8 @@ function sendLunarCalenderEvent(recvs, cron) {
 
       var tithi_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[4]/td[2]", doc)
       tithi_name = tithi_nodes[0].firstChild.data
-      tithi_name = tithi_name.split(" ")[0]
-      switch (tithi_name) {
+      tithi_fname = tithi_name.split(" ")[0]
+      switch (tithi_fname) {
         case "Pratipada":
           tithi = 1
           break;
@@ -127,23 +127,38 @@ function sendLunarCalenderEvent(recvs, cron) {
       day = masa + '-' + paksha + '-' + tithi
       console.log("Day:", day)
 
+      // NOTE:
+      //  For `/tithi` command: Send any events along with tithi info for the command.
+      //  For Cron: Send event details if any...
       var msgs = []
-      var events = await myData.getSchedule(calender_lunar_URL, day)
-      if (cron) {
-        if (events.length == 0) {
-          console.log("No events present.")
-          return 0
-        }
-      } else {
+
+      if (!cron) {
         console.log("Sending today's masa, paksha and tithi details for /tithi command...")
-        msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi + '*')
+        msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_name + '*')
       }
 
-      // For `/tithi`: Send any events along with tithi info for the command...
-      // For Cron: Send event details if any...
-      console.log("Lunar Scheduled Events: ", events)
-      for (e in events) {
-        msgs.push(day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+      days = [
+        masa + '-' + paksha + '-' + tithi,
+        masa + '-' + paksha + '-*',
+        masa + '-' + '-*' + tithi,
+        masa + '-' + '-*-*',
+        '*-' + paksha + '-' + tithi,
+        '*-' + paksha + '-*',
+        '*-*-' + tithi,
+        '*-*-*',
+      ]
+
+      jsonData = await myData.getJsonDataFromUrl(calender_lunar_URL)
+      for (d in days) {
+        var events = myData.getKeyDataFromHash(jsonData, days[d])
+        console.log("Lunar Scheduled Events: ", events)
+        for (e in events) {
+          msgs.push(day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+        }
+      }
+      if (cron && msgs.length == 0) {
+        console.log("No events present.")
+        return 0
       }
 
       for (m in msgs) {
