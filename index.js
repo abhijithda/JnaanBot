@@ -8,6 +8,8 @@ const dataURL = myConfig.data_URL()
 const calender_lunar_URL = myConfig.calender_lunar_URL()
 const calender_solar_URL = myConfig.calender_solar_URL()
 
+const myTithi = require('./tithi')
+
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
 
@@ -69,61 +71,10 @@ function sendLunarCalenderEvent(recvs, cron) {
       console.log("Paksha:", paksha)
 
       var tithi_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[4]/td[2]", doc)
-      tithi_name = tithi_nodes[0].firstChild.data
-      tithi_fname = tithi_name.split(" ")[0]
-      switch (tithi_fname) {
-        case "Pratipada":
-          tithi = 1
-          break;
-        case "Dwitiya":
-          tithi = 2
-          break;
-        case "Tritiya":
-          tithi = 3
-          break;
-        case "Chaturthi":
-          tithi = 4
-          break;
-        case "Panchami":
-          tithi = 5
-          break;
-        case "Shashthi":
-          tithi = 6
-          break;
-        case "Saptami":
-          tithi = 7
-          break;
-        case "Ashtami":
-          tithi = 8
-          break;
-        case "Navami":
-          tithi = 9
-          break;
-        case "Dashami":
-          tithi = 10
-          break;
-        case "Ekadashi":
-          tithi = 11
-          break;
-        case "Dwadashi":
-          tithi = 12
-          break;
-        case "Trayodashi":
-          tithi = 13
-          break;
-        case "Chaturdashi":
-          tithi = 14
-          break;
-        case "Amavasya":
-        case "Purnima":
-          tithi = 15
-          break;
-        default:
-          console.log("Not registered tithi found:", tithi_name)
-          break;
-      }
-      console.log("Tithi:", tithi)
-
+      tithi_info = tithi_nodes[0].firstChild.data
+      tithi_name = tithi_info.split(" ")[0]
+      tithi = myTithi.getTithiNumber(tithi_name)
+      console.log("Tithi: %s(%d)", tithi_name, tithi)
       day = masa + '-' + paksha + '-' + tithi
       console.log("Day:", day)
 
@@ -140,8 +91,8 @@ function sendLunarCalenderEvent(recvs, cron) {
       days = [
         masa + '-' + paksha + '-' + tithi,
         masa + '-' + paksha + '-*',
-        masa + '-' + '-*' + tithi,
-        masa + '-' + '-*-*',
+        masa + '-*-' + tithi,
+        masa + '-*-*',
         '*-' + paksha + '-' + tithi,
         '*-' + paksha + '-*',
         '*-*-' + tithi,
