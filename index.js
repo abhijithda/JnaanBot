@@ -1,5 +1,7 @@
 require("console-stamp")(console)
+
 const myConfig = require('./config');
+
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
 const token = myConfig.token()
@@ -7,8 +9,6 @@ const myData = require('./getdata')
 const dataURL = myConfig.data_URL()
 const calender_lunar_URL = myConfig.calender_lunar_URL()
 const calender_solar_URL = myConfig.calender_solar_URL()
-
-const myTithi = require('./tithi')
 
 process.env.NTBA_FIX_319 = 1;
 const TelegramBot = require('node-telegram-bot-api');
@@ -39,67 +39,42 @@ async function sendEventMessage() {
 
 // Implements Tithi command and also sends out notifications based on tithi from the cron job.
 function sendLunarCalenderEvent(recvs, cron) {
-  var http = require('http');
   console.log("Entering sendLunarCalenderEvent() to ...", recvs)
 
-  var options = {
-    host: 'panchangam.org',
-    path: '/'
-  }
+  const myPanchang = require('./panchang')
+  myPanchang.getPanchangInfo().then(info => {
+    // console.log("Info: ", info)
+    masa = info["Amanta Month"]
+    paksha = info["Paksha"]
+    tithi_info = info["Tithi"]
+    tithi_name = tithi_info.split(" ")[0]
+    tithi = myPanchang.getTithiNumber(tithi_name)
+    console.log("Masa:", masa)
+    console.log("Paksha:", paksha)
+    console.log("Tithi: %s(%d)", tithi_name, tithi)
 
-  var request = http.request(options, function (res) {
-    var data = '';
-    res.on('data', function (chunk) {
-      data += chunk;
-    });
-    res.on('end', async function () {
-      // console.log(data);
-      var xpath = require('xpath')
-        , dom = require('xmldom').DOMParser
-      var doc = new dom().parseFromString(data)
+    // NOTE:
+    //  For `/tithi` command: Send any events along with tithi info for the command.
+    //  For Cron: Send event details if any...
+    var msgs = []
 
-      // console.log(nodes[0].localName + ": " + nodes[0].firstChild.data)
-      // console.log("Node: " + nodes[0].toString())
-      var masa = "", paksha = "", tithi = -1, day = ""
-      var masa_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[2]/td[2]", doc)
-      masa = masa_nodes[0].firstChild.data
-      console.log("Masa:", masa)
+    if (!cron) {
+      console.log("Sending today's masa, paksha and tithi details for /tithi command...")
+      msgs.push('*' + masa + ' Masa ' + paksha + ' ' + tithi_info + '*')
+    }
 
-      var paksha_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[3]/td[2]", doc)
-      paksha = paksha_nodes[0].firstChild.data
-      paksha = paksha.split(" ")[0]
-      console.log("Paksha:", paksha)
+    days = [
+      masa + '-' + paksha + '-' + tithi,
+      masa + '-' + paksha + '-*',
+      masa + '-*-' + tithi,
+      masa + '-*-*',
+      '*-' + paksha + '-' + tithi,
+      '*-' + paksha + '-*',
+      '*-*-' + tithi,
+      '*-*-*',
+    ]
 
-      var tithi_nodes = xpath.select("/html[1]/body[1]/div[1]/div[2]/div[1]/div[4]/table[1]/tbody[1]/tr[4]/td[2]", doc)
-      tithi_info = tithi_nodes[0].firstChild.data
-      tithi_name = tithi_info.split(" ")[0]
-      tithi = myTithi.getTithiNumber(tithi_name)
-      console.log("Tithi: %s(%d)", tithi_name, tithi)
-      day = masa + '-' + paksha + '-' + tithi
-      console.log("Day:", day)
-
-      // NOTE:
-      //  For `/tithi` command: Send any events along with tithi info for the command.
-      //  For Cron: Send event details if any...
-      var msgs = []
-
-      if (!cron) {
-        console.log("Sending today's masa, paksha and tithi details for /tithi command...")
-        msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_name + '*')
-      }
-
-      days = [
-        masa + '-' + paksha + '-' + tithi,
-        masa + '-' + paksha + '-*',
-        masa + '-*-' + tithi,
-        masa + '-*-*',
-        '*-' + paksha + '-' + tithi,
-        '*-' + paksha + '-*',
-        '*-*-' + tithi,
-        '*-*-*',
-      ]
-
-      jsonData = await myData.getJsonDataFromUrl(calender_lunar_URL)
+    myData.getJsonDataFromUrl(calender_lunar_URL).then(jsonData => {
       for (d in days) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
         console.log("Lunar Scheduled Events: ", events)
@@ -126,10 +101,6 @@ function sendLunarCalenderEvent(recvs, cron) {
     });
   });
 
-  request.on('error', function (e) {
-    console.log(e.message);
-  });
-  request.end();
 }
 
 
