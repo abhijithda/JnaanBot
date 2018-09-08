@@ -60,7 +60,7 @@ function sendLunarCalenderEvent(recvs, cron) {
 
     if (!cron) {
       console.log("Sending today's masa, paksha and tithi details for /tithi command...")
-      msgs.push('*' + masa + ' Masa ' + paksha + ' ' + tithi_info + '*')
+      msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_info + '*')
     }
 
     days = [

@@ -58,8 +58,10 @@ module.exports = {
         return tithi
     },
 
+    // http://www.mypanchang.com/mobilewidget.php?cityname=Milpitas-CA
+
     getPanchangInfo: async function () {
-        const panchangURL = "https://www.drikpanchang.com"
+        const panchangURL = "https://www.drikpanchang.com?geoname-id=5373327"
         const jsdom = require("jsdom");
         const { JSDOM } = jsdom;
 
@@ -67,10 +69,15 @@ module.exports = {
             console.log("Parsing %s URL for panchang info...", panchangURL)
             // console.log(dom.serialize());
             var display_next = 0
+            var start = 0
             var key = ""
             var info = {
                 "Tithi": "",
+                "Nakshatra": "",
+                "Yoga": "",
+                "Karana": "",
                 "Paksha": "",
+                "Weekday": "",
                 "Amanta Month": ""
             }
 
@@ -81,28 +88,46 @@ module.exports = {
                     if (display_next != 0) {
                         console.log(text)
                         display_next--
-                        if (text.trim() != ":") {
-                            info[key] += text.trim()
-                            if (display_next) {
-                                info[key] += " "
-                            }
+                        // Check for ":" once display_next is set, as otherwise it might have matched something else.
+                        if (text.trim() == ":") {
+                            start = 1
+                        }
+                        if (start && text.trim() != ":") {
+                            info[key] += " " + text.trim()
                         }
                     }
-                    if (text === "Tithi") {
-                        key = text
-                        console.log("--->", key)
-                        display_next = 5;
+                    switch (text) {
+                        case "Tithi":
+                        case "Nakshatra":
+                        case "Yoga":
+                        case "Karana":
+                            start = 0
+                            key = text
+                            console.log("--->", key)
+                            display_next = 5;
+                            break;
+                        case "Amanta Month":
+                        case "Paksha":
+                        case "Weekday":
+                            start = 0
+                            key = text
+                            console.log("--->", key)
+                            display_next = 2;
+                            break;
+                        default:
+                            if (display_next == 0) { start = 0 }
+                            break;
                     }
-                    if (text === "Amanta Month" || text === "Paksha") {
-                        key = text
-                        console.log("--->", key)
-                        display_next = 2;
-                    }
-                },
+                }
             }, { decodeEntities: true });
             parser.write(dom.serialize());
             parser.end();
 
+            var hkeys = Object.keys(info)
+            for (var k in hkeys){
+                info[hkeys[k]] = info[hkeys[k]].trim()
+            }
+            info["Paksha"] = info["Paksha"].split(" ")[0]
             console.log("Panchang Info: ", info)
             return info
         });
