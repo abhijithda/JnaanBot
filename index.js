@@ -56,13 +56,6 @@ function sendLunarCalenderEvent(recvs, cron) {
     // NOTE:
     //  For `/tithi` command: Send any events along with tithi info for the command.
     //  For Cron: Send event details if any...
-    var msgs = []
-
-    if (!cron) {
-      console.log("Sending today's masa, paksha and tithi details for /tithi command...")
-      msgs.push('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_info + '*')
-    }
-
     days = [
       masa + '-' + paksha + '-' + tithi,
       masa + '-' + paksha + '-*',
@@ -74,6 +67,7 @@ function sendLunarCalenderEvent(recvs, cron) {
       '*-*-*',
     ]
 
+    var msgs = []
     myData.getJsonDataFromUrl(calender_lunar_URL).then(jsonData => {
       for (d in days) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
@@ -87,17 +81,24 @@ function sendLunarCalenderEvent(recvs, cron) {
         return 0
       }
 
-      for (m in msgs) {
-        for (r in recvs) {
-          var msg = msgs[m]
-          console.log("Sending notification message " + msg + " to reciever " + recvs[r])
-          bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
-            console.log(error.code);  // => 'ETELEGRAM'
-            console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-            // bot.sendMessage(msg.chat.id, error.response.body.description)
-          });
-        }
+      if (!cron) {
+        console.log("Sending today's masa, paksha and tithi details for /tithi command...")
       }
+      msgs.unshift('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_info + '*')
+
+      var msg = ""
+      for (m in msgs) {
+        msg += msgs[m] + "\n"
+      }
+      for (r in recvs) {
+        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+        bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
+          console.log(error.code);  // => 'ETELEGRAM'
+          console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+          // bot.sendMessage(msg.chat.id, error.response.body.description)
+        });
+      }      
+
     });
   });
 
