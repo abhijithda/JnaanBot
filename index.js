@@ -79,7 +79,7 @@ function sendLunarCalenderEvent(recvs, cron) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
         console.log("Lunar Scheduled Events: ", events)
         for (e in events) {
-          msgs.push(day + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+          msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
         }
       }
       if (cron && msgs.length == 0) {

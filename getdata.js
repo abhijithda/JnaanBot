@@ -41,9 +41,9 @@ module.exports = {
             console.warn("No data found!")
             val = ""
         } else {
-            val = console.info(data[key])
+            val = data[key]
         }
-        console.info("Exiting getKeyDataFromHash()...")
+        console.info("Exiting getKeyDataFromHash() with...", val)
         return val;
     },
 
