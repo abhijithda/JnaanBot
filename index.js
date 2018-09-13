@@ -211,7 +211,7 @@ bot.on('callback_query', async function (message) {
   msgdata = resp[1]
   console.log("callback_query message data: ", msgdata)
   if (send_msg) {
-    msgdata = "_Providing details to " + message.from.first_name + "_ (@" + message.from.username + ") " + `
+    msgdata = "_Providing details to " + message.from.first_name + "_ [(@" + message.from.username + ")](@" + message.from.username + ") " + `
     
 `
       + msgdata
@@ -360,7 +360,7 @@ bot.on('message', (msg) => {
     for (m in msg.new_chat_members) {
       rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
         msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
-        "(@" + msg.new_chat_members[m].username + ")!"
+        "[(@" + msg.new_chat_members[m].username + ")](@" + msg.new_chat_members[m].username + ")!"
     }
     send_msg = 1
     welcome_msg = 1
@@ -370,7 +370,7 @@ bot.on('message', (msg) => {
     console.info("User left...")
     rmsg += "\nMichchhāmi Dukkaḍaṃ 🙏 " +
       msg.left_chat_member.first_name + " " + msg.left_chat_member.last_name +
-      "(@" + msg.left_chat_member.username + ")!"
+      "[(@" + msg.new_chat_members[m].username + ")](@" + msg.left_chat_member.username + ")!"
     send_msg = 1
   }
 
