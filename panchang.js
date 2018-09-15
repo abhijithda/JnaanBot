@@ -69,6 +69,7 @@ module.exports = {
             console.log("Parsing %s URL for panchang info...", panchangURL)
             // console.log(dom.serialize());
             var display_next = 0
+            var ampm = 0
             var start = 0
             var key = ""
             var info = {
@@ -93,7 +94,17 @@ module.exports = {
                             start = 1
                         }
                         if (start && text.trim() != ":") {
+                            if (ampm == 1){
+                                ampm = 0
+                                var mon_dd = text.split()
+                                text = mon_dd[0]
+                            }
                             info[key] += " " + text.trim()
+                            // If there is a date after AM, then include that also... Ex: Shashthi upto 02:15 AM , Sep 15
+                            if (text == "AM" || text == "PM") {
+                                display_next++;
+                                ampm = 1
+                            }
                         }
                     }
                     switch (text) {
@@ -124,7 +135,7 @@ module.exports = {
             parser.end();
 
             var hkeys = Object.keys(info)
-            for (var k in hkeys){
+            for (var k in hkeys) {
                 info[hkeys[k]] = info[hkeys[k]].trim()
             }
             info["Paksha"] = info["Paksha"].split(" ")[0]
