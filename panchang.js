@@ -94,12 +94,23 @@ module.exports = {
                             start = 1
                         }
                         if (start && text.trim() != ":") {
-                            if (ampm == 1){
+                            var skip = 0
+                            if (ampm == 1) {
                                 ampm = 0
-                                var mon_dd = text.split()
-                                text = mon_dd[0]
+                                // If there is a comma i.e., ',', then there could be month and date. Otherwise it would be next field!
+                                var curfieldPattern = /[,]/;
+                                var result = text.match(curfieldPattern)
+                                console.log("Result", Object.prototype.toString.call(result))
+                                if (Object.prototype.toString.call(result) == '[object Null]') {
+                                    skip = 1
+                                } else {
+                                    var mon_dd = text.split()
+                                    text = mon_dd[0]
+                                }
                             }
-                            info[key] += " " + text.trim()
+                            if (!skip) {
+                                info[key] += " " + text.trim()
+                            }
                             // If there is a date after AM, then include that also... Ex: Shashthi upto 02:15 AM , Sep 15
                             if (text == "AM" || text == "PM") {
                                 display_next++;
