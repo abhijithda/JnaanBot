@@ -61,7 +61,8 @@ module.exports = {
     // http://www.mypanchang.com/mobilewidget.php?cityname=Milpitas-CA
 
     getPanchangInfo: async function () {
-        const panchangURL = "https://www.drikpanchang.com?geoname-id=5373327"
+        const panchangURL = "https://www.drikpanchang.com?geoname-id=5373327" // Milpitas
+        // https://www.drikpanchang.com/?geoname-id=5128581 // New York
         const jsdom = require("jsdom");
         const { JSDOM } = jsdom;
 

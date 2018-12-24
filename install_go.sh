@@ -13,3 +13,5 @@ fi
 echo "Go setup successful.";
 
 set +x;
+
+echo "Run 'export PATH=${PATH}:${GO_BASE_DIR}/go/bin;' to make go available in PATH."

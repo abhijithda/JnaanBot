@@ -1,9 +1,12 @@
 #!/bin/bash
 
+set -x;
+
 LANG=en_US.UTF-8
 LC_CTYPE=en_US.UTF-8
 
 receivers=${NOTIFY_RECEIVERS}
+echo "Sending notification to " ${NOTIFY_RECEIVERS}
 text=${NOTIFY_MESSAGE:-"Jai Jinendra 🙏 !"}
 receivers=${NOTIFY_RECEIVERS}
 token=${TOKEN}
@@ -13,7 +16,7 @@ token=${TOKEN}
 
 TIME="10"
 URL="https://api.telegram.org/bot$token/sendMessage"
-
+echo "Sending notification to " ${receivers[@]}
 for cid in ${receivers[@]}; do
     echo "Sending notification message \"$text\" to receiver \"${cid}\"..."
     # curl -s --max-time $TIME -d "chat_id=$cid&text=$text" $URL >/dev/null
