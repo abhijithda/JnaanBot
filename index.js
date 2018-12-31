@@ -44,12 +44,14 @@ function sendLunarCalenderEvent(recvs, cron) {
   const myPanchang = require('./panchang')
   myPanchang.getPanchangInfo().then(info => {
     // console.log("Info: ", info)
-    masa = info["Amanta Month"]
+    // Using Purnimanta masa for checking calender events as events are based Purnimanta.
+    masa = info["Purnimanta Month"]
     paksha = info["Paksha"]
     tithi_info = info["Tithi"]
     tithi_name = tithi_info.split(" ")[0]
     tithi = myPanchang.getTithiNumber(tithi_name)
-    console.log("Masa:", masa)
+    console.log("Purnimanta Masa:", info["Purnimanta Month"])
+    console.log("Amanta Masa:", info["Amanta Month"])
     console.log("Paksha:", paksha)
     console.log("Tithi: %s(%d)", tithi_name, tithi)
 
@@ -84,7 +86,7 @@ function sendLunarCalenderEvent(recvs, cron) {
       if (!cron) {
         console.log("Sending today's masa, paksha and tithi details for /tithi command...")
       }
-      msgs.unshift('*' + masa + ' masa ' + paksha + ' paksha ' + tithi_info + '*')
+      msgs.unshift('*' + info["Amanta Month"] + '(Amanta) ' + info["Purnimanta Month"] + '(Purnimanta) masa ' + paksha + ' paksha ' + tithi_info + '*')
 
       var msg = ""
       for (m in msgs) {

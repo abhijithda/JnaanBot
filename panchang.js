@@ -80,7 +80,8 @@ module.exports = {
                 "Karana": "",
                 "Paksha": "",
                 "Weekday": "",
-                "Amanta Month": ""
+                "Amanta Month": "",
+                "Purnimanta Month": ""
             }
 
             var htmlparser = require("htmlparser2");
@@ -130,6 +131,7 @@ module.exports = {
                             display_next = 5;
                             break;
                         case "Amanta Month":
+                        case "Purnimanta Month":
                         case "Paksha":
                         case "Weekday":
                             start = 0
