@@ -86,8 +86,14 @@ function sendLunarCalenderEvent(recvs, cron) {
       if (!cron) {
         console.log("Sending today's masa, paksha and tithi details for /tithi command...")
       }
-      msgs.unshift('*' + info["Amanta Month"] + '(Amanta) ' + info["Purnimanta Month"] + '(Purnimanta) masa ' + paksha + ' paksha ' + tithi_info + '*')
-
+      if (info["Amanta Month"] == info["Purnimanta Month"]) {
+        msgs.unshift('*' + info["Amanta Month"] + ' masa ' + paksha +
+          ' paksha ' + tithi_info + '*')
+      } else {
+        msgs.unshift('*' + info["Amanta Month"] + '(Amanta) ' +
+          info["Purnimanta Month"] + '(Purnimanta) masa ' +
+          paksha + ' paksha ' + tithi_info + '*')
+      }
       var msg = ""
       for (m in msgs) {
         msg += msgs[m] + "\n"
@@ -99,7 +105,7 @@ function sendLunarCalenderEvent(recvs, cron) {
           console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
           // bot.sendMessage(msg.chat.id, error.response.body.description)
         });
-      }      
+      }
 
     });
   });
