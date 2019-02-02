@@ -2,17 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 	"time"
 )
 
 const (
 	myURL     = "" // "http://localhost"
-	mySite    = myURL + port + "/"
-	port      = ":8008"
 	greetPath = "greet"
 	jsonPath  = "json"
 	yamlPath  = "yaml"
@@ -67,6 +67,14 @@ func greet(w http.ResponseWriter, r *http.Request) {
 func main() {
 	log.Println("Entering main with", os.Args[:])
 
+	portPtr := flag.Int("port", 0, "Port number to run this program.")
+	flag.Parse()
+
+	if *portPtr == 0 {
+		panic("Port number must be specified.")
+	}
+	portStr := ":" + strconv.Itoa(*portPtr)
+	log.Println("Starting webservice on port:", portStr)
 	http.HandleFunc("/", greet)
-	http.ListenAndServe(port, nil)
+	log.Fatal(http.ListenAndServe(portStr, nil))
 }
