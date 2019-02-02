@@ -1,2 +1,2 @@
 web: /app/bin/main -port $PORT
-web: cd app; npm start
+worker: cd app; npm start
