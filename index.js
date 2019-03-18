@@ -19,6 +19,13 @@ const bot = new TelegramBot(token, { polling: true });
 var CronJob = require('cron').CronJob;
 try {
   var job = new CronJob({
+    // cronTime is in following format: "ss mm hh dd mon dwk"
+    // Seconds: 0-59
+    // Minutes: 0-59
+    // Hours: 0-23
+    // Day of Month: 1-31
+    // Months: 0-11 (Jan-Dec)
+    // Day of Week: 0-6 (Sun-Sat)
     cronTime: myConfig.notify_time(),
     onTick: function () {
       msg = sendEventMessage()

@@ -61,6 +61,7 @@ module.exports = {
     // http://www.mypanchang.com/mobilewidget.php?cityname=Milpitas-CA
 
     getPanchangInfo: async function () {
+        // https://www.drikpanchang.com/panchang/day-panchang.html?geoname-id=5373327&date=19/01/2019
         const panchangURL = "https://www.drikpanchang.com?geoname-id=5373327" // Milpitas
         // https://www.drikpanchang.com/?geoname-id=5128581 // New York
         const jsdom = require("jsdom");
