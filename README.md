@@ -12,6 +12,7 @@ Set the following environmnet variables
 DATA_URL="<url containing json data>"
 CALENDER_LUNAR_URL="<url containing lunar calender events data>"
 CALENDER_SOLAR_URL="<url containing solar calender events data>"
+CALENDER_AMAVASYAANTA_URL="<url containing amavasyaanta events data>"
 NOTIFY_TIME="<Time at which notification should be sent>"
 NOTIFY_MESSAGE="<Message to be notified>"
 NOTIFY_RECEIVERS="<Recepients to be notified>" # Ex: "receiver1,receiver2,receiverN"

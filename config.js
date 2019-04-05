@@ -33,6 +33,10 @@ module.exports = {
         return process.env.CALENDER_LUNAR_URL
     },
 
+    calender_amavasyaanta_URL: function () {
+        return process.env.CALENDER_AMAVASYAANTA_URL
+    },
+
     calender_solar_URL: function () {
         return process.env.CALENDER_SOLAR_URL
     },

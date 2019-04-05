@@ -8,6 +8,7 @@ const token = myConfig.token()
 const myData = require('./getdata')
 const dataURL = myConfig.data_URL()
 const calender_lunar_URL = myConfig.calender_lunar_URL()
+const calender_amavasyaanta_URL = myConfig.calender_amavasyaanta_URL()
 const calender_solar_URL = myConfig.calender_solar_URL()
 
 process.env.NTBA_FIX_319 = 1;
@@ -76,8 +77,38 @@ function sendLunarCalenderEvent(recvs, cron) {
       '*-*-*',
     ]
 
-    var msgs = []
+    myData.getJsonDataFromUrl(calender_amavasyaanta_URL).then(jsonData => {
+      var msgs = []
+      for (d in days) {
+        var events = myData.getKeyDataFromHash(jsonData, days[d])
+        console.log("Amavasyaanta Events: ", events)
+        for (e in events) {
+          msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+        }
+      }
+      if (cron && msgs.length == 0) {
+        console.log("No events present.")
+        return 0
+      }
+
+      msgs.unshift('*' + info["Amanta Month"] + ' Amanta-masa ' +
+        paksha + ' paksha ' + tithi_info + '*')
+      var msg = ""
+      for (m in msgs) {
+        msg += msgs[m] + "\n"
+      }
+      for (r in recvs) {
+        console.log("Sending notification message " + msg + " to reciever " + recvs[r])
+        bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
+          console.log(error.code);  // => 'ETELEGRAM'
+          console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+          // bot.sendMessage(msg.chat.id, error.response.body.description)
+        });
+      }
+    });
+
     myData.getJsonDataFromUrl(calender_lunar_URL).then(jsonData => {
+      var msgs = []
       for (d in days) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
         console.log("Lunar Scheduled Events: ", events)
@@ -97,8 +128,7 @@ function sendLunarCalenderEvent(recvs, cron) {
         msgs.unshift('*' + info["Amanta Month"] + ' masa ' + paksha +
           ' paksha ' + tithi_info + '*')
       } else {
-        msgs.unshift('*' + info["Amanta Month"] + '(Amanta) ' +
-          info["Purnimanta Month"] + '(Purnimanta) masa ' +
+        msgs.unshift('*' + info["Purnimanta Month"] + ' Purnimanta-masa ' +
           paksha + ' paksha ' + tithi_info + '*')
       }
       var msg = ""
@@ -113,7 +143,6 @@ function sendLunarCalenderEvent(recvs, cron) {
           // bot.sendMessage(msg.chat.id, error.response.body.description)
         });
       }
-
     });
   });
 
