@@ -49,10 +49,20 @@ The query data json must have queries as the keys, and it's values could either 
 
 #### Schedule
 
-The schedule json should contain the key as month and date in the `mm-dd` format, and it's value should be a list of objects consisting of `Title` and `Description`.
+The schedule json should contain the key as month and date in the `mm-dd` format, and it's value should be a list of objects consisting of `Title` and `Description`. The `Description` could be a string or a list.
 
 ```json
 {
+    "06-07": [
+        {
+            "Title": "Shurta Panchami",
+            "Description": [
+                "Shurta Panchami",
+                "",
+                ""
+            ]
+        }
+    ],
     "07-19": [
         {
             "Title": "Ashtanika Parva",
