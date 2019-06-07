@@ -45,6 +45,22 @@ async function sendEventMessage() {
   sendSolarCalenderEvent(recvs)
 }
 
+function getMessagesOfEvents(msgs, events) {
+  console.log("Entering getMessagesOfEvents() with ...", events)
+  for (e in events) {
+    var strDesc = ""
+    var desc = events[e]["Description"]
+    if (Object.prototype.toString.call(desc) == '[object String]') {
+      strDesc = desc
+    } else if ((Object.prototype.toString.call(desc) == '[object Object]') ||
+      (Object.prototype.toString.call(desc) == '[object Array]')) {
+      strDesc = desc.join("\n")
+    }
+    msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + strDesc)
+  }
+  console.log("Exiting getMessagesOfEvents() with ...", msgs)
+}
+
 // Implements Tithi command and also sends out notifications based on tithi from the cron job.
 function sendLunarCalenderEvent(recvs, cron) {
   console.log("Entering sendLunarCalenderEvent() to ...", recvs)
@@ -82,9 +98,7 @@ function sendLunarCalenderEvent(recvs, cron) {
       for (d in days) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
         console.log("Amavasyaanta Events: ", events)
-        for (e in events) {
-          msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
-        }
+        getMessagesOfEvents(msgs, events)
       }
       if (cron && msgs.length == 0) {
         console.log("No events present.")
@@ -113,7 +127,7 @@ function sendLunarCalenderEvent(recvs, cron) {
         var events = myData.getKeyDataFromHash(jsonData, days[d])
         console.log("Lunar Scheduled Events: ", events)
         for (e in events) {
-          msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + events[e]["Description"])
+          getMessagesOfEvents(msgs, events)
         }
       }
       if (cron && msgs.length == 0) {
