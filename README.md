@@ -1,6 +1,7 @@
-# JnaanBot
+# EventNotifyBot
 
-A telegram app bot whose data could be customized by specifying different URL containing data.json.
+A telegram app bot which allows one to send event notifications based on either the solar or the lunar calender. The event data could be customized by specifying different CALENDER URLs containing data in json format.
+It is also a chat bot, which allows providing answers to custom commands, and along with providing options to view even further details of answers through menu/list option. The menu/list or answers are based on the data already provided through data.json URL.
 
 ## Setup Bot
 
