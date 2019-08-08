@@ -19,7 +19,7 @@ module.exports = {
     },
 
     getJsonDataFromUrl: async function(url) {
-        console.info("Entering getJsonDataFromUrl()...")
+        console.info("Entering getJsonDataFromUrl() with %s...", url)
         // read JSON from URL
         let response = await fetch(url);
         let data = await response.json();
