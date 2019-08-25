@@ -1,6 +1,7 @@
 require("console-stamp")(console)
 
 const myConfig = require('./config');
+const signup = require('./signup')
 
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
@@ -393,6 +394,29 @@ bot.onText(/\/get_day/, (msg) => {
   }
   bot.sendMessage(chatId, day);
 });
+
+
+// Main like function for signup here!
+bot.onText(/\/signup/, (msg) => {
+  // 'msg' is the received Message from Telegram
+  console.log("Signup")
+  // recvs = [msg.chat.id]
+  console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
+
+  callSignup(msg)
+});
+
+async function callSignup(msg) {
+  var gsheetid = myConfig.signup_gsheet_id()
+  if (!gsheetid){
+    console.log("Spreadsheet key must be specified.");
+    return;
+  }
+  await signup.signupPerson(gsheetid, msg)
+  var sendMsg = msg.from.first_name + ", You are successfully signed up."
+  bot.sendMessage(msg.from.id, sendMsg)
+  console.log(sendMsg)
+}
 
 bot.onText(/\/tithi/, (msg) => {
   // 'msg' is the received Message from Telegram
