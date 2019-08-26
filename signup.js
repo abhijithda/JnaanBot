@@ -1,4 +1,7 @@
 'use strict';
+
+const myConfig = require('./config');
+
 var GoogleSpreadsheet = require('google-spreadsheet');
 var async = require('async');
 
@@ -8,45 +11,54 @@ module.exports = {
 
 // spreadsheet key is the long id in the sheets URL
 // var doc = new GoogleSpreadsheet('<spreadsheet key>');
-var doc = new GoogleSpreadsheet('1nEtWyd2GZtoDeKDt1eUbpaXx1o1uN8kFabv-sgFO1GQ');
+// var doc = new GoogleSpreadsheet('1nEtWyd2GZtoDeKDt1eUbpaXx1o1uN8kFabv-sgFO1GQ');
+var doc = new GoogleSpreadsheet(myConfig.signup_gsheet_id());
 var gsheets
-var gsheet
 
 async.series([
     function setAuth(step) {
         // see notes below for authentication instructions!
         // var creds = require('./google-generated-creds.json');
-        var creds = require('./service-account.json');
+        // var creds = require('./service-account.json');
         // OR, if you cannot save the file locally (like on heroku)
         // var creds_json = {
         //   client_email: 'yourserviceaccountemailhere@google.com',
         //   private_key: 'your long private key stuff here'
         // }
-
-        doc.useServiceAccountAuth(creds, step);
+        var creds = {
+            client_email: myConfig.client_email_g(),
+            private_key: myConfig.pkey_g(),
+        }
+        doc.useServiceAccountAuth(creds, function(err){
+            if(err){
+                console.log("Error while authenticating:")
+                console.log(err);
+                return;
+            }
+            step()
+        });
     },
+    
     function getInfoAndWorksheets(step) {
         doc.getInfo(function (err, info) {
+            // console.log("Info: ", info)
             console.log('Loaded doc: ' + info.title + ' by ' + info.author.email);
             gsheets = info.worksheets
-            // console.log("Sheets: ", gsheets)
-            gsheet = info.worksheets[0];
-            console.log('sheet 1: ' + gsheet.title + ' ' + gsheet.rowCount + 'x' + gsheet.colCount);
-            // console.log("Info: ", info)
             step();
         });
     },
 
-    function callsignupPerson(step) {
-        signupPerson();
-        step();
-    }
+    // function callsignupPerson(step) {
+    //     signupPerson();
+    //     step();
+    // }
 ])
 
-async function signupPerson(msg) {
-    console.log("In signupPerson()...")
+async function signupPerson(msg, event) {
+    console.log("In signupPerson()...", event)
 
-    var sheetTitle = "signup"
+    var sheetTitle = event
+    var gsheet
     doc.addWorksheet({
         title: sheetTitle
     }, async function (err, sheet) {

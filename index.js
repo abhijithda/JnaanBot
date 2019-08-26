@@ -399,20 +399,24 @@ bot.onText(/\/get_day/, (msg) => {
 // Main like function for signup here!
 bot.onText(/\/signup/, (msg) => {
   // 'msg' is the received Message from Telegram
-  console.log("Signup")
+  console.log("COMMAND: /signup")
+  // recvs = [msg.chat.id]
+  console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
+  callSignup(msg, "signup")
+});
+
+bot.onText(/\/signup-event (.+)/, (msg, match) => {
+  // 'msg' is the received Message from Telegram
+  var event = match[1]
+  console.log("COMMAND: /signup-event", event)
   // recvs = [msg.chat.id]
   console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
 
-  callSignup(msg)
+  callSignup(msg, event)
 });
 
-async function callSignup(msg) {
-  var gsheetid = myConfig.signup_gsheet_id()
-  if (!gsheetid){
-    console.log("Spreadsheet key must be specified.");
-    return;
-  }
-  await signup.signupPerson(gsheetid, msg)
+async function callSignup(msg, event) {
+  await signup.signupPerson(msg, event)
   var sendMsg = msg.from.first_name + ", You are successfully signed up."
   bot.sendMessage(msg.from.id, sendMsg)
   console.log(sendMsg)
