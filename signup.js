@@ -12,7 +12,7 @@ module.exports = {
 // spreadsheet key is the long id in the sheets URL
 // var doc = new GoogleSpreadsheet('<spreadsheet key>');
 // var doc = new GoogleSpreadsheet('1nEtWyd2GZtoDeKDt1eUbpaXx1o1uN8kFabv-sgFO1GQ');
-var doc = new GoogleSpreadsheet(myConfig.signup_gsheet_id());
+var doc = new GoogleSpreadsheet(myConfig.sheet_id());
 var gsheets
 
 async.series([
@@ -26,11 +26,11 @@ async.series([
         //   private_key: 'your long private key stuff here'
         // }
         var creds = {
-            client_email: myConfig.client_email_g(),
-            private_key: myConfig.pkey_g(),
+            client_email: myConfig.client_email(),
+            private_key: myConfig.pkey(),
         }
-        doc.useServiceAccountAuth(creds, function(err){
-            if(err){
+        doc.useServiceAccountAuth(creds, function (err) {
+            if (err) {
                 console.log("Error while authenticating:")
                 console.log(err);
                 return;
@@ -38,7 +38,7 @@ async.series([
             step()
         });
     },
-    
+
     function getInfoAndWorksheets(step) {
         doc.getInfo(function (err, info) {
             // console.log("Info: ", info)
@@ -47,15 +47,10 @@ async.series([
             step();
         });
     },
-
-    // function callsignupPerson(step) {
-    //     signupPerson();
-    //     step();
-    // }
 ])
 
 async function signupPerson(msg, event) {
-    console.log("In signupPerson()...", event)
+    console.log("In signupPerson()...", msg, event)
 
     var sheetTitle = event
     var gsheet
@@ -88,7 +83,7 @@ async function signupPerson(msg, event) {
         console.log("Setting header row for new sheet: ", gsheet.title)
         //resize a sheet
         gsheet.resize({ rowCount: 500, colCount: 20 }); //async
-        var res = await gsheet.setHeaderRow(['date', 'event', 'person', 'tid', 'notes'],
+        var res = await gsheet.setHeaderRow(['person', 'tid', 'notes'],
             function (err) {
                 if (err) {
                     console.log(err)
@@ -98,19 +93,13 @@ async function signupPerson(msg, event) {
             }); //async  
         console.log("Header is now set: ", res)
 
-        console.log("Checking whether message is passed", msg)
-        if (!msg) {
-            console.log("User message info was not passed.")
-            return
-        }
         var currentDate = new Date();
         var userdate = currentDate.getFullYear() + "/" + currentDate.getMonth() + "/" + currentDate.getDate()
         console.log("Date: " + userdate)
         var res = gsheet.addRow({
-            date: userdate,
-            notes: msg.text.split(),
             person: msg.from.first_name + " " + msg.from.last_name,
-            tid: msg.from.id
+            tid: msg.from.id,
+            notes: msg.text.split(),
         }, function (err, row) {
             if (err) {
                 console.log(err)

@@ -397,7 +397,7 @@ bot.onText(/\/get_day/, (msg) => {
 
 
 // Main like function for signup here!
-bot.onText(/\/signup/, (msg) => {
+bot.onText(/\/signup$/, (msg) => {
   // 'msg' is the received Message from Telegram
   console.log("COMMAND: /signup")
   // recvs = [msg.chat.id]

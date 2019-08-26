@@ -41,16 +41,16 @@ module.exports = {
         return process.env.CALENDER_SOLAR_URL
     },
 
-    signup_gsheet_id: function () {
-        return process.env.SIGNUP_GSHEET_ID
+    sheet_id: function () {
+        return process.env.SHEET_ID
     },
 
-    client_email_g: function () {
-        return process.env.CLIENT_EMAIL_G
+    client_email: function () {
+        return process.env.CLIENT_EMAIL
     },
 
-    pkey_g: function () {
-        return process.env.PKEY_G
+    pkey: function () {
+        return process.env.PKEY
     },
 
     token: function () {
