@@ -2,7 +2,6 @@ require("console-stamp")(console)
 
 const myConfig = require('./config');
 const events = require('./events')
-const signup = require('./signup')
 
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
@@ -416,7 +415,7 @@ bot.onText(/\/get_day/, (msg) => {
 });
 
 
-// Main like function for signup here!
+// Main like function for events signup here!
 bot.onText(/\/events$/, async function (msg) {
   // 'msg' is the received Message from Telegram
   console.log("COMMAND: /events")
@@ -424,23 +423,6 @@ bot.onText(/\/events$/, async function (msg) {
   console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
   await events.getEvents(msg, sendMessage2User)
 });
-
-bot.onText(/\/signup-event (.+)/, (msg, match) => {
-  // 'msg' is the received Message from Telegram
-  var event = match[1]
-  console.log("COMMAND: /signup-event", event)
-  // recvs = [msg.chat.id]
-  console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
-
-  callSignup(msg, event)
-});
-
-async function callSignup(msg, event) {
-  await signup.signupPerson(msg, event)
-  var sendMsg = msg.from.first_name + ", You are successfully signed up."
-  console.log(sendMsg)
-  bot.sendMessage(msg.from.id, sendMsg)
-}
 
 bot.onText(/\/tithi/, (msg) => {
   // 'msg' is the received Message from Telegram
