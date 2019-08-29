@@ -41,6 +41,18 @@ module.exports = {
         return process.env.CALENDER_SOLAR_URL
     },
 
+    sheet_id: function () {
+        return process.env.SHEET_ID
+    },
+
+    client_email: function () {
+        return process.env.CLIENT_EMAIL
+    },
+
+    pkey: function () {
+        return process.env.PKEY
+    },
+
     token: function () {
         return process.env.TOKEN
     }
