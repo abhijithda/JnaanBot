@@ -41,6 +41,10 @@ async.series([
 
     function getInfoAndWorksheets(step) {
         doc.getInfo(function (err, info) {
+            if (err) {
+                console.log(err);
+                return;
+            }
             // console.log("Info: ", info)
             console.log('Loaded doc: ' + info.title + ' by ' + info.author.email);
             gsheets = info.worksheets
@@ -49,11 +53,99 @@ async.series([
     },
 ])
 
+function isSheetPresent(name, cb) {
+    console.log("In isSheetPresent(%s)...", name)
+    for (var s in gsheets) {
+        console.log("Checking if %s is %s", gsheets[s].title, name)
+        if (gsheets[s].title == name) {
+            var sheet = gsheets[s]
+            console.log("sheet present: ", sheet.title)
+            if (cb) {
+                return cb(null, sheet)
+            }
+            return null, sheet
+        }
+    }
+    if (cb) {
+        return cb(new Error("sheet" + name + "not found."))
+    }
+    return new Error("sheet %s not found.", name)
+}
+
+function isNamedRowPresent(sheet, name, cb) {
+    console.log("In isNamedRowPresent(%s, %s)...", sheet.title, name)
+    sheet.getRows({
+        offset: 1,
+    }, function (err, rows) {
+        var events = [];
+        if (err) {
+            console.log(err)
+            cb(err)
+        }
+        console.log('Read ' + rows.length + ' rows')
+        // console.log(rows);
+        for (var r in rows) {
+            if (name) {
+                console.log("Checking if %s is %s", rows[r].name, name)
+                if (rows[r].name == name) {
+                    console.log("Matched: ", rows[r].name)
+                    events.unshift(rows[r].name)
+                }
+            } else {
+                events.unshift(rows[r].name)
+            }
+        }
+        cb(events)
+    })
+}
+
+function getEventSheet(eventName) {
+    console.log("In getEventSheet(%s)...", eventName)
+
+    var sheet
+    var events
+    async.series([
+        function (done) {
+            var err
+            isSheetPresent("events", function (err, lsheet) {
+                if (err) {
+                    console.log(err)
+                }
+                console.log("lSheet title info:", lsheet.title)
+                sheet = lsheet
+            })
+            console.log("Sheet title info:", sheet.title)
+            done()
+        },
+        function (done) {
+            isNamedRowPresent(sheet, null, function (levents) {
+                events = levents
+                done()
+            })
+        },
+        function (done) { isSheetPresent(eventName, done) },
+
+        function (done) {
+            sheet.getRows({}, function (err, rows) {
+                if (err) {
+                    console.log(err)
+                    return done(err);
+                }
+                console.log('Read ' + rows.length + ' rows')
+                // console.log(rows);
+                done();
+            })
+        },
+
+    ]);
+}
+
 async function signupPerson(msg, event) {
     console.log("In signupPerson()...", msg, event)
 
     var sheetTitle = event
-    var gsheet
+    var gsheet = getEventSheet(event);
+    return
     doc.addWorksheet({
         title: sheetTitle
     }, async function (err, sheet) {

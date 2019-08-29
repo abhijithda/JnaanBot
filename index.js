@@ -1,6 +1,7 @@
 require("console-stamp")(console)
 
 const myConfig = require('./config');
+const events = require('./events')
 const signup = require('./signup')
 
 // replace the value below with the Telegram token you receive from @BotFather
@@ -235,21 +236,24 @@ async function runCmd(msg) {
   var resp = await get_contents(cmd)
   send_msg = resp[0]
   msgdata = resp[1]
-  console.log("Command result: ", msgdata)
+  sendMessage2User(msg, msgdata)
+}
 
-  if (Object.prototype.toString.call(msgdata) == '[object String]') {
-    if (msgdata.length == 0) {
+function sendMessage2User(msg, data) {
+  console.log("Data to be sent:", data)
+  if (Object.prototype.toString.call(data) == '[object String]') {
+    if (data.length == 0) {
       // console.log("No data available to send for %s from %s!", cmd, dataURL)
       return
     }
-    bot.sendMessage(msg.chat.id, msgdata, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
+    bot.sendMessage(msg.chat.id, data, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   }
   else {
-    bot.sendMessage(msg.chat.id, msg.text, msgdata).catch((error) => {
+    bot.sendMessage(msg.chat.id, msg.text, data).catch((error) => {
       console.log(error.code);  // => 'ETELEGRAM'
       console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(msg.chat.id, error.response.body.description)
@@ -264,6 +268,22 @@ bot.onText(/\/.*/, (cmd) => {
 
 bot.on('callback_query', async function (message) {
   console.log("callback_query message: ", message)
+  var txt = message.data
+  console.log("Received callback_data: ", txt);
+  var fields = txt.split(":")
+  if (fields) {
+    // Drop action specifier i.e., fields before ":"
+    fields.shift();
+    var func_param = fields.join(':')
+    var args = func_param.split(' ')
+    func = args.shift()
+    var params = args.join(',')
+    console.log("Calling function - %s(%s)", func, params)
+    if (func == 'events.signup') {
+      events.signup(params, message, sendMessage2User);
+      return
+    }
+  }
   var msg = message.message;
   var resp = await get_contents(message.data)
   send_msg = resp[0]
@@ -397,12 +417,12 @@ bot.onText(/\/get_day/, (msg) => {
 
 
 // Main like function for signup here!
-bot.onText(/\/signup$/, (msg) => {
+bot.onText(/\/events$/, async function (msg) {
   // 'msg' is the received Message from Telegram
-  console.log("COMMAND: /signup")
+  console.log("COMMAND: /events")
   // recvs = [msg.chat.id]
   console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
-  callSignup(msg, "signup")
+  await events.getEvents(msg, sendMessage2User)
 });
 
 bot.onText(/\/signup-event (.+)/, (msg, match) => {
@@ -418,8 +438,8 @@ bot.onText(/\/signup-event (.+)/, (msg, match) => {
 async function callSignup(msg, event) {
   await signup.signupPerson(msg, event)
   var sendMsg = msg.from.first_name + ", You are successfully signed up."
-  bot.sendMessage(msg.from.id, sendMsg)
   console.log(sendMsg)
+  bot.sendMessage(msg.from.id, sendMsg)
 }
 
 bot.onText(/\/tithi/, (msg) => {
