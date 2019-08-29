@@ -19,6 +19,15 @@ NOTIFY_MESSAGE="<Message to be notified>"
 NOTIFY_RECEIVERS="<Recepients to be notified>" # Ex: "receiver1,receiver2,receiverN"
 # replace the value below with the Telegram token you receive from @BotFather
 TOKEN=<YOUR_TELEGRAM_BOT_TOKEN>
+SHEET_ID="<Google sheet id>"
+CLIENT_EMAIL="<email from service account json>"
+PKEY="<private_key from service account json>"
+
+# For Private key: refer https://www.npmjs.com/package/google-spreadsheet.
+# Save your private key to a text file
+# Replace \n with actual line breaks
+# Replace \u003d with =
+# heroku config:add GOOGLE_PRIVATE_KEY="$(cat yourfile.txt)"
 ```
 
 ### Sample JSONs
