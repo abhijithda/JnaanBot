@@ -204,8 +204,8 @@ function signup(eventinfo, msg, sendMessage2User) {
                         return
                     }
                 }
-                console.log(msg.from.id, "doesn't exist.")
-                // done()
+                console.log(msg.from.id, "does not exist.")
+                done()
             })
         },
 
