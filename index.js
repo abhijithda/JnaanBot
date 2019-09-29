@@ -115,8 +115,8 @@ function sendLunarCalenderEvent(recvs, cron) {
       for (r in recvs) {
         console.log("Sending notification message " + msg + " to reciever " + recvs[r])
         bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
-          console.log(error.code);  // => 'ETELEGRAM'
-          console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+          console.error(error.code);  // => 'ETELEGRAM'
+          console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
           // bot.sendMessage(msg.chat.id, error.response.body.description)
         });
       }
@@ -153,8 +153,8 @@ function sendLunarCalenderEvent(recvs, cron) {
       for (r in recvs) {
         console.log("Sending notification message " + msg + " to reciever " + recvs[r])
         bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
-          console.log(error.code);  // => 'ETELEGRAM'
-          console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+          console.error(error.code);  // => 'ETELEGRAM'
+          console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
           // bot.sendMessage(msg.chat.id, error.response.body.description)
         });
       }
@@ -177,8 +177,8 @@ async function sendSolarCalenderEvent(recvs) {
     for (r in recvs) {
       console.log("Sending notification message " + msg + " to reciever " + recvs[r])
       bot.sendMessage(recvs[r], msg, { parse_mode: "Markdown" }).catch((error) => {
-        console.log(error.code);  // => 'ETELEGRAM'
-        console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        console.error(error.code);  // => 'ETELEGRAM'
+        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
         // bot.sendMessage(msg.chat.id, error.response.body.description)
       });
     }
@@ -228,36 +228,63 @@ async function get_contents(cur_topic) {
   return [send_msg, new_msg]
 }
 
-async function runCmd(msg) {
+async function runCmd(msg, opts) {
   var msgTxt = msg.text.split("@")
   var cmd = msgTxt[0]
   console.log("Running command: ", cmd)
   var resp = await get_contents(cmd)
   send_msg = resp[0]
   msgdata = resp[1]
-  sendMessage2User(msg, msgdata)
+  sendMessage2User(msg, msgdata, opts)
 }
 
-function sendMessage2User(msg, data) {
-  console.log("Data to be sent:", data)
+function sendMessage2User(msg, data, opts) {
+  console.debug("Data to be sent:", data)
+  var options = opts || {};
+  console.debug("Options:", options)
+  var id_to_send = options.id_to_send || msg.chat.id
+  console.debug("Object type: ", Object.prototype.toString.call(data))
+
   if (Object.prototype.toString.call(data) == '[object String]') {
     if (data.length == 0) {
       // console.log("No data available to send for %s from %s!", cmd, dataURL)
       return
     }
-    bot.sendMessage(msg.chat.id, data, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
-      console.log(error.code);  // => 'ETELEGRAM'
-      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-      bot.sendMessage(msg.chat.id, error.response.body.description)
-    });
+
+    if (id_to_send == msg.chat.id) {
+      bot.sendMessage(id_to_send, data, { parse_mode: "Markdown", reply_to_message_id: msg.message_id }).catch((error) => {
+        console.error(error.code);  // => 'ETELEGRAM'
+        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        bot.sendMessage(msg.chat.id, error.response.body.description)
+      });
+    } else {
+      bot.sendMessage(id_to_send, data, { parse_mode: "Markdown" }).catch((error) => {
+        console.error(error.code);  // => 'ETELEGRAM'
+        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        bot.sendMessage(msg.chat.id, error.response.body.description)
+      });
+    }
   }
   else {
-    bot.sendMessage(msg.chat.id, msg.text, data).catch((error) => {
-      console.log(error.code);  // => 'ETELEGRAM'
-      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(id_to_send, msg.text, data).catch((error) => {
+      console.error(error.code);  // => 'ETELEGRAM'
+      console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   }
+}
+
+// Send keyboard option to user directly i.e., not to group.
+function sendKBMessage2User(msg, title, data) {
+  bot.sendMessage(msg.from.id, title, {
+    "reply_markup": {
+      // "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"], [{ text: "Phone", request_contact: true }]],
+      "keyboard": data,
+      one_time_keyboard: true,
+      resize_keyboard: true
+    }
+  });
+
 }
 
 bot.onText(/\/.*/, (cmd) => {
@@ -279,7 +306,10 @@ bot.on('callback_query', async function (message) {
     var params = args.join(',')
     console.log("Calling function - %s(%s)", func, params)
     if (func == 'events.signup') {
-      events.signup(params, message, sendMessage2User);
+      events.signup(params, message, sendMessage2User, sendKBMessage2User);
+      return
+    } else if (func == 'events.confirmRegistration') {
+      events.confirmRegistration(params, message, sendMessage2User);
       return
     }
   }
@@ -289,13 +319,14 @@ bot.on('callback_query', async function (message) {
   msgdata = resp[1]
   console.log("callback_query message data: ", msgdata)
   if (send_msg) {
-    msgdata = "_Providing details to " + message.from.first_name + "_ [(@" + message.from.username + ")](@" + message.from.username + ") " + `
+    msgdata = "_Providing details to " + message.from.first_name + "_ [(@" + message.from.username + ")](@" + message.from.username + ") "
+      + `
     
 `
       + msgdata
     bot.sendMessage(msg.chat.id, msgdata, { reply_to_message_id: msg.message_id, parse_mode: "Markdown" }).catch((error) => {
-      console.log(error.code);  // => 'ETELEGRAM'
-      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      console.error(error.code);  // => 'ETELEGRAM'
+      console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(msg.chat.id, error.response.body.description)
     });
   } else {
@@ -305,12 +336,17 @@ bot.on('callback_query', async function (message) {
 });
 
 bot.onText(/\/Panchaparamesti/, (msg) => {
-  bot.sendMessage(msg.chat.id, "Pancha Paramestis", {
+  bot.sendMessage(msg.from.id, "Pancha Paramestis", {
     "reply_markup": {
-      // "inline_keyboard": JSON.stringify([["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]]}
-      "keyboard": [["Siddha"], ["Sadhu", "Arihanta", "Acharya"], ["Updhaya"]],
+      // "inline_keyboard": [
+      //   [{ text: "Siddha", callback_data: 'siddha' }],
+      //   [{ text: "Saadhu",  callback_data: 'saadhu' }, { text: "Arihanta",  callback_data: 'arihanta' }, { text: "Acharya",  callback_data: 'acharya' }],
+      //   [{ text: "Upadhaya",  callback_data: 'upadhaya' }],
+      //   [{ text: "Phone", request_contact: true }]
+      // ],
+      "keyboard": [["Siddha"], ["Saadhu", "Arihanta", "Acharya"], ["Updhaya"], [{ text: "Phone", request_contact: true }]],
       one_time_keyboard: true,
-      // resize_keyboard: true
+      resize_keyboard: true
     }
   });
 });
@@ -318,13 +354,13 @@ bot.onText(/\/Panchaparamesti/, (msg) => {
 bot.onText(/\/leave_group/, (msg) => {
   const chatId = msg.chat.id;
   bot.kickChatMember(chatId, msg.from.id).catch((error) => {
-    console.log(error.code);  // => 'ETELEGRAM'
-    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    console.error(error.code);  // => 'ETELEGRAM'
+    console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
   });
   bot.unbanChatMember(chatId, msg.from.id).catch((error) => {
-    console.log(error.code);  // => 'ETELEGRAM'
-    console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    console.error(error.code);  // => 'ETELEGRAM'
+    console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
   });
 });
@@ -439,27 +475,31 @@ bot.on('message', (msg) => {
   const chatId = msg.chat.id;
 
   var send_msg = 1
-  var welcome_msg = 0
   var send_audio = 0
   rmsg = ""
 
   if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
-    console.info("New user joined...")
+    console.debug("New users joined...")
+
     for (m in msg.new_chat_members) {
       rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
         msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
         "[(@" + msg.new_chat_members[m].username + ")](@" + msg.new_chat_members[m].username + ")!"
+      sendMessage2User(msg, rmsg, { id_to_send: msg.new_chat_members[m].id })
+
+      msg.text = "/welcome"
+      runCmd(msg, { id_to_send: msg.new_chat_members[m].id })
+      msg.text = ""
     }
-    send_msg = 1
-    welcome_msg = 1
+    return;
   }
 
   if (Object.prototype.toString.call(msg.left_chat_member) != '[object Undefined]') {
     console.info("User left...")
-    rmsg += "\nMichchhāmi Dukkaḍaṃ 🙏 " +
-      msg.left_chat_member.first_name + " " + msg.left_chat_member.last_name +
-      "[(@" + msg.new_chat_members[m].username + ")](@" + msg.left_chat_member.username + ")!"
-    send_msg = 1
+    rmsg = "\nMichchhāmi Dukkaḍaṃ 🙏 " +
+      msg.left_chat_member.first_name + " " + msg.left_chat_member.last_name + "!"
+    sendMessage2User(msg, rmsg, { id_to_send: msg.left_chat_member.id })
+    return
   }
 
   if (Object.prototype.toString.call(msg.text) != '[object Undefined]') {
@@ -500,17 +540,11 @@ bot.on('message', (msg) => {
     bot.sendMessage(chatId, rmsg, {
       reply_to_message_id: msg.message_id, parse_mode: "Markdown"
     }).catch((error) => {
-      console.log(error.code);  // => 'ETELEGRAM'
-      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      console.error(error.code);  // => 'ETELEGRAM'
+      console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
     });
     send_msg = 0
-    if (welcome_msg) {
-      msg.text = "/welcome"
-      runCmd(msg)
-      msg.text = ""
-      welcome_msg = 0
-    }
     // return
   }
   if (send_audio) {
@@ -519,8 +553,8 @@ bot.on('message', (msg) => {
     console.log("Sending audio " + song)
 
     bot.sendAudio(chatId, song).catch((error) => {
-      console.log(error.code);  // => 'ETELEGRAM'
-      console.log(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+      console.error(error.code);  // => 'ETELEGRAM'
+      console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
       bot.sendMessage(chatId, error.response.body.description)
     });
     return
@@ -532,3 +566,17 @@ bot.on('message', (msg) => {
 
   // getUserProfilePhotos(chatId)
 });
+
+function callback_data_encode(json_data) {
+  console.log("In function callback_data_encode()...")
+
+  var json_str = JSON.stringify(json_data)
+  return json_str
+}
+
+function callback_data_decode(json_str) {
+  console.log("In function callback_data_decode()...")
+
+  var json_data = JSON.parse(json_str)
+  return json_data
+}
