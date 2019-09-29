@@ -33,7 +33,7 @@ async.series([
         doc.useServiceAccountAuth(creds, function (err) {
             if (err) {
                 console.log("Error while authenticating:")
-                console.log(err);
+                console.error(err);
                 return;
             }
             step()
@@ -43,7 +43,7 @@ async.series([
     function getInfoAndWorksheets(step) {
         doc.getInfo(function (err, info) {
             if (err) {
-                console.log(err);
+                console.error(err);
                 return;
             }
             // console.log("Info: ", info)
@@ -90,7 +90,7 @@ async function getEvents(msg, sendMessage2User) {
                 offset: 1,
             }, function (err, rows) {
                 if (err) {
-                    console.log(err)
+                    console.error(err)
                     done(err)
                 }
                 console.log('Read ' + rows.length + ' rows')
@@ -106,6 +106,13 @@ async function getEvents(msg, sendMessage2User) {
         function sendEvents(done) {
             var aevents = [];
             for (var e in events) {
+                // var title = "Add phone number for event"
+                // var json_cbdata_str = callback_data_encode({"func":"event.signup", "event":eventinfo, "email":email})
+                // var KBdata = [[{ text: "Email", callback_data: json_cbdata_str }],
+                // [{ text: "Phone", request_contact: true }]]
+                // sendKBMessage(msg, title, KBdata)
+
+
                 aevents.unshift([{ 'text': events[e], 'callback_data': "func:events.signup " + events[e] }])
             }
             var json_data = {
@@ -124,14 +131,14 @@ async function getEvents(msg, sendMessage2User) {
         },
 
     ], function (err) {
-        console.log(err) // "another thing"
+        console.error(err) // "another thing"
     });
 
     console.log("Events:", events)
     return events;
 }
 
-function signup(eventinfo, msg, sendMessage2User) {
+function signup(eventinfo, msg, sendMessage2User, sendKBMessage2User) {
     console.log("In signup(%s)...", msg, eventinfo)
 
     var sheetTitle = eventinfo
@@ -144,7 +151,7 @@ function signup(eventinfo, msg, sendMessage2User) {
                 title: sheetTitle
             }, async function (err, sheet) {
                 if (err) {
-                    console.log(err)
+                    console.error(err)
                     if (err = ~ "already exists") {
                         console.log("Already exists")
                         // console.log("Sheets before loop: ", gsheets)
@@ -168,10 +175,10 @@ function signup(eventinfo, msg, sendMessage2User) {
                 console.log("Setting header row for new sheet: ", gsheet.title)
                 //resize a sheet
                 gsheet.resize({ rowCount: 500, colCount: 20 }); //async
-                gsheet.setHeaderRow(['person', 'tid', 'notes'],
+                gsheet.setHeaderRow(['person', 'headcount', 'mobile', 'email', 'tid', 'notes'],
                     function (err) {
                         if (err) {
-                            console.log(err)
+                            console.error(err)
                             done(err)
                         }
                         console.log("Header is now set")
@@ -186,7 +193,7 @@ function signup(eventinfo, msg, sendMessage2User) {
             }, function (err, rows) {
                 var events = [];
                 if (err) {
-                    console.log(err)
+                    console.error(err)
                     done(err)
                 }
                 console.log('Read ' + rows.length + ' rows')
@@ -197,7 +204,7 @@ function signup(eventinfo, msg, sendMessage2User) {
                         alreadyPresent = true
                         console.log("Already present:", rows[r])
                         var data = msg.from.first_name +
-                            ", You've already signed up for " + eventinfo + "."
+                            ", You've already registered for " + eventinfo + " event."
                         console.log(data)
                         sendMessage2User(msg.message, data)
                         done()
@@ -213,9 +220,40 @@ function signup(eventinfo, msg, sendMessage2User) {
             if (alreadyPresent) {
                 return
             }
+
+            if (msg.message.chat.type == "supergroup") {
+                var data_options = [
+                    [{ text: 'Register', url: "https://t.me/" + msg.message.from.username }],
+                    [{ text: 'Close', switch_inline_query_current_chat: "/event" }]
+                ]
+                var json_data = {
+                    inline_keyboard: data_options
+                }
+
+                console.debug("JSON data: ")
+                console.debug(json_data)
+                var data = {
+                    reply_markup: JSON.stringify(
+                        json_data
+                    )
+                };
+                sendMessage2User(msg.message, data)
+
+                json_data = {
+                    inline_keyboard: [[msg.message.reply_markup]]
+                }
+                console.debug("JSON data: ")
+                console.debug(json_data)
+                data = {
+                    reply_markup: msg.message.reply_markup
+                };
+                sendMessage2User(msg.message, data, { id_to_send: msg.from.id })
+                done()
+                return;
+            }
             var currentDate = new Date();
             var userdate = currentDate.getFullYear() + "/" + currentDate.getMonth() + "/" + currentDate.getDate()
-            console.log("Date: " + userdate)
+            console.debug("Date: " + userdate)
             var personName = msg.from.first_name
             if (msg.from.last_name) {
                 personName += " " + msg.from.last_name
@@ -226,7 +264,51 @@ function signup(eventinfo, msg, sendMessage2User) {
                 // notes: msg.text.split(),
             }, function (err, row) {
                 if (err) {
-                    console.log(err)
+                    console.error(err)
+                    done(err)
+                }
+                var title = "Confirm event registration"
+                // var json_cbdata_str = callback_data_encode({"func":"event.confirmRegistration", "event":eventinfo, "email":email})
+                var KBdata = [
+                    [{ text: "Confirm", request_contact: true, callback_data: "abcdef" }],
+                    [{ text: "Cancel", callback_data: "" }],
+                ]
+                sendKBMessage2User(msg, title, KBdata)
+
+                done()
+            });
+        },
+
+    ], function (err) {
+        if (err) {
+            console.error(err) // "another thing"
+            sendMessage2User(msg.message, err)
+        }
+    });
+    return
+}
+
+
+function confirmRegistration(eventinfo, msg, sendMessage2User) {
+    console.log("In confirmRegistration(%s)...", msg, eventinfo)
+
+    var gsheet
+    async.series([
+        function (done) {
+            var currentDate = new Date();
+            var userdate = currentDate.getFullYear() + "/" + currentDate.getMonth() + "/" + currentDate.getDate()
+            console.debug("Date: " + userdate)
+            var personName = msg.from.first_name
+            if (msg.from.last_name) {
+                personName += " " + msg.from.last_name
+            }
+            gsheet.addRow({
+                person: personName,
+                tid: msg.from.id,
+                // notes: msg.text.split(),
+            }, function (err, row) {
+                if (err) {
+                    console.error(err)
                     done(err)
                 }
                 console.log("Entry added:", currentDate)
@@ -235,13 +317,20 @@ function signup(eventinfo, msg, sendMessage2User) {
                 console.log(data)
                 // bot.sendMessage(msg.from.id, data)
                 sendMessage2User(msg.message, data)
+
+                // var title = "Add phone number for event"
+                // var json_cbdata_str = callback_data_encode({"func":"event.signup", "event":eventinfo, "email":email})
+                // var KBdata = [[{ text: "Email", callback_data: json_cbdata_str }],
+                // [{ text: "Phone", request_contact: true }]]
+                // sendKBMessage(msg, title, KBdata)
+
                 done()
             });
         },
 
     ], function (err) {
         if (err) {
-            console.log(err) // "another thing"
+            console.error(err) // "another thing"
             sendMessage2User(msg.message, err)
         }
     });
