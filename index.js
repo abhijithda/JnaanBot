@@ -481,16 +481,16 @@ bot.on('message', (msg) => {
   if (Object.prototype.toString.call(msg.new_chat_members) != '[object Undefined]') {
     console.debug("New users joined...")
 
-    for (m in msg.new_chat_members) {
-      rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
-        msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
-        "[(@" + msg.new_chat_members[m].username + ")](@" + msg.new_chat_members[m].username + ")!"
-      sendMessage2User(msg, rmsg, { id_to_send: msg.new_chat_members[m].id })
+    // for (m in msg.new_chat_members) {
+    //   rmsg += "\n*ಜೈ ಜಿನೇಂದ್ರ* 🙏 *जय जिनेन्द्र* 🙏 *Jai Jinendra* 🙏 " +
+    //     msg.new_chat_members[m].first_name + " " + msg.new_chat_members[m].last_name +
+    //     "[(@" + msg.new_chat_members[m].username + ")](@" + msg.new_chat_members[m].username + ")!"
+    //   sendMessage2User(msg, rmsg, { id_to_send: msg.new_chat_members[m].id })
 
-      msg.text = "/welcome"
-      runCmd(msg, { id_to_send: msg.new_chat_members[m].id })
-      msg.text = ""
-    }
+    //   msg.text = "/welcome"
+    //   runCmd(msg, { id_to_send: msg.new_chat_members[m].id })
+    //   msg.text = ""
+    // }
     return;
   }
 
