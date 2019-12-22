@@ -62,6 +62,7 @@ function getMessagesOfEvents(msgs, events) {
     for (m in msgs) {
       if (msgs[m] == newEvent) {
         present = true
+        break
       }
     }
     if (present == false) {
