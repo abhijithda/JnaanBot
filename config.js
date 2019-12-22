@@ -8,6 +8,10 @@ module.exports = {
     },
 
     notify_receivers: function () {
+        if (Object.prototype.toString.call(process.env.NOTIFY_RECEIVERS) == '[object Undefined]'){
+            console.debug("NOTIFY_RECEIVERS value is not set.")
+            return []
+        }
         var recvs = process.env.NOTIFY_RECEIVERS.split(",")
         console.log("No. of receivers: " + recvs.length)
         for (r in recvs) {

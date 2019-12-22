@@ -14,10 +14,12 @@
     "xmldom": "^0.1.27",
     "xpath": "0.0.27"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "mocha": "^6.2.2"
+  },
   "scripts": {
     "start": "node index.js 2>&1 | tee -a console.log",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "mocha --reporter list"
   },
   "repository": {
     "type": "git",
