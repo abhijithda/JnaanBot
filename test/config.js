@@ -1,7 +1,8 @@
 const assert = require('assert');
 const config = require("../config.js")
 
-describe('Config Tests', function () {
+describe('config.js', function () {
+
     describe('data_URL()', function () {
         it('When "DATA_URL" is not set', function(){
             assert.equal(Object.prototype.toString.call(config.data_URL()), '[object Undefined]')
