@@ -57,7 +57,17 @@ function getMessagesOfEvents(msgs, events) {
       (Object.prototype.toString.call(desc) == '[object Array]')) {
       strDesc = desc.join("\n")
     }
-    msgs.push(days[d] + ": *" + events[e]["Title"] + "*\n" + strDesc)
+    var newEvent = days[d] + ": *" + events[e]["Title"] + "*\n" + strDesc
+    var present = false
+    for (m in msgs) {
+      if (msgs[m] == newEvent) {
+        present = true
+        break
+      }
+    }
+    if (present == false) {
+      msgs.push(newEvent)
+    }
   }
   console.log("Exiting getMessagesOfEvents() with ...", msgs)
 }
