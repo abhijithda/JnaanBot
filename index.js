@@ -462,9 +462,9 @@ bot.onText(/\/get_day/, (msg) => {
 
 
 // Main like function for events signup here!
-bot.onText(/\/events$/, async function (msg) {
+bot.onText(/\/cmd:events$/, async function (msg) {
   // 'msg' is the received Message from Telegram
-  console.log("COMMAND: /events")
+  console.log("COMMAND: /cmd:events")
   // recvs = [msg.chat.id]
   console.log(msg.text, "from", msg.from.first_name, msg.from.last_name, msg.from.id)
   await events.getEvents(msg, sendMessage2User)
