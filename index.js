@@ -478,6 +478,24 @@ bot.onText(/\/tithi/, (msg) => {
 });
 
 
+bot.onText(/\/sendquiz/, (msg) => {
+  // 'msg' is the received Message from Telegram
+  console.log("Sending quiz...")
+  recvs = [msg.chat.id]
+
+  quizOptions = JSON.stringify(["yes", "no"])
+  bot.sendPoll(msg.chat.id, "Test", quizOptions, {
+    is_anonymous: false,
+    type: "quiz",
+    correct_option_id: 0,
+    open_period: 30,
+  }).catch((error) => {
+    console.error(error.code);  // => 'ETELEGRAM'
+    console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+    bot.sendMessage(chatId, error.response.body.description)
+  });
+});
+
 // Listen for any kind of message. There are different kinds of
 // messages.
 bot.on('message', (msg) => {
