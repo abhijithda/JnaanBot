@@ -477,8 +477,7 @@ bot.onText(/\/tithi/, (msg) => {
   sendLunarCalenderEvent(recvs, 0)
 });
 
-
-bot.onText(/\/sendquiz/, (msg) => {
+bot.onText(/\/samplequiz/, (msg) => {
   // 'msg' is the received Message from Telegram
   console.log("Sending quiz...")
   recvs = [msg.chat.id]
@@ -488,12 +487,43 @@ bot.onText(/\/sendquiz/, (msg) => {
     is_anonymous: false,
     type: "quiz",
     correct_option_id: 0,
-    open_period: 30,
+    // open_period: 30,
   }).catch((error) => {
     console.error(error.code);  // => 'ETELEGRAM'
     console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
     bot.sendMessage(chatId, error.response.body.description)
   });
+
+});
+
+
+bot.onText(/\/quiz (.+)/, (msg, match) => {
+  // 'msg' is the received Message from Telegram
+  console.log("Sending quiz...")
+  recvs = [msg.chat.id]
+  // 'msg' is the received Message from Telegram
+  // 'match' is the result of executing the regexp above on the text content
+  // of the message
+  const chatId = msg.chat.id;
+  const quiz_URL = match[1]; // the captured "whatever"
+
+  myData.getJsonDataFromUrl(quiz_URL).then(quizzes => {
+    for (q in quizzes) {
+      bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
+        is_anonymous: false,
+        type: "quiz",
+        correct_option_id: quizzes[q].correctOption,
+        explanation: quizzes[q].explanation,
+        // open_period: 30,
+        // close_date: 10,
+      }).catch((error) => {
+        console.error(error.code);  // => 'ETELEGRAM'
+        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        bot.sendMessage(chatId, error.response.body.description)
+      });
+    }
+  });
+
 });
 
 // Listen for any kind of message. There are different kinds of
