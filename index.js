@@ -377,12 +377,13 @@ bot.onText(/\/leave_group/, (msg) => {
 
 
 // Matches "/echo [whatever]"
-bot.onText(/\/echo (.+)/, (msg, match) => {
+bot.onText(/\/echo(|@.+Bot) (.+)/, (msg, match) => {
+  console.log("In `echo`:", msg, match)
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
   const chatId = msg.chat.id;
-  const resp = match[1]; // the captured "whatever"
+  const resp = match[2]; // the captured "whatever"
 
   // send back the matched "whatever" to the chat
   bot.sendMessage(chatId, resp);
@@ -497,30 +498,56 @@ bot.onText(/\/samplequiz/, (msg) => {
 });
 
 
-bot.onText(/\/quiz (.+)/, (msg, match) => {
+bot.onText(/\/quiz(|@\w+)(.*)/, (msg, match) => {
   // 'msg' is the received Message from Telegram
-  console.log("Sending quiz...")
+  console.log("Sending quiz...", match)
   recvs = [msg.chat.id]
   // 'msg' is the received Message from Telegram
   // 'match' is the result of executing the regexp above on the text content
   // of the message
   const chatId = msg.chat.id;
-  const quiz_URL = match[1]; // the captured "whatever"
+  const text = match[2]; // the captured "whatever"
+  var pattern1 = /\s*(.+)(\s+\d+)\s*/;
+  var result = text.match(pattern1)
+  var delaysecs = 0
+  var quiz_URL = ""
+  console.log("Result:", result)
+  if (result != null) {
+    delaysecs = result[2] * 1000; // "millisecs" to "secs"
+  } else {
+    var pattern2 = /\s*(.+)\s*/;
+    result = text.match(pattern2)
+    console.log("Result:", result)
+  }
+  if (result == null) {
+    console.log("Command not in expected format!")
+    bot.sendMessage(chatId, "Specify as:\n /quiz <http-link> [secs-bn-questions]\n")
+    return
+  }
+
+  quiz_URL = result[1]; // "URL"
+  if (quiz_URL == "") {
+    console.log("Quiz link not specified!")
+    bot.sendMessage(chatId, "Quiz link must be specified.\n /quiz <http-link> [secs-bn-questions]\n")
+    return
+  }
 
   myData.getJsonDataFromUrl(quiz_URL).then(quizzes => {
     for (q in quizzes) {
-      bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
-        is_anonymous: false,
-        type: "quiz",
-        correct_option_id: quizzes[q].correctOption,
-        explanation: quizzes[q].explanation,
-        // open_period: 30,
-        // close_date: 10,
-      }).catch((error) => {
-        console.error(error.code);  // => 'ETELEGRAM'
-        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-        bot.sendMessage(chatId, error.response.body.description)
-      });
+      setTimeout(function () {
+        bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
+          is_anonymous: false,
+          type: "quiz",
+          correct_option_id: quizzes[q].correctOption,
+          explanation: quizzes[q].explanation,
+          // open_period: 30,
+          // close_date: 10,
+        }).catch((error) => {
+          console.error(error.code);  // => 'ETELEGRAM'
+          console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+          bot.sendMessage(chatId, error.response.body.description)
+        });
+      }, (delaysecs * q));
     }
   });
 
