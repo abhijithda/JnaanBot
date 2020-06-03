@@ -534,7 +534,7 @@ bot.onText(/\/quiz(|@\w+)(.*)/, (msg, match) => {
 
   myData.getJsonDataFromUrl(quiz_URL).then(quizzes => {
     for (q in quizzes) {
-      setTimeout(function () {
+      // setTimeout(function () {
         bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
           is_anonymous: false,
           type: "quiz",
@@ -547,7 +547,7 @@ bot.onText(/\/quiz(|@\w+)(.*)/, (msg, match) => {
           console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
           bot.sendMessage(chatId, error.response.body.description)
         });
-      }, (delaysecs * q));
+      // }, (delaysecs * q));
     }
   });
 
