@@ -9,7 +9,7 @@
     "google-spreadsheet": "^2.0.7",
     "htmlparser2": "^3.10.1",
     "jsdom": "^12.2.0",
-    "node-fetch": "^2.6.0",
+    "node-fetch": "^2.6.1",
     "node-telegram-bot-api": "^0.40.0",
     "xmldom": "^0.1.27",
     "xpath": "0.0.27"
