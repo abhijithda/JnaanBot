@@ -2,6 +2,7 @@ require("console-stamp")(console)
 
 const myConfig = require('./config');
 const events = require('./events')
+const child_process = require('child_process')
 
 // replace the value below with the Telegram token you receive from @BotFather
 // const token = '${TELEGRAM_BOT_TOKEN}';
@@ -19,6 +20,7 @@ const TelegramBot = require('node-telegram-bot-api');
 const bot = new TelegramBot(token, { polling: true });
 
 var CronJob = require('cron').CronJob;
+const { stringify } = require("querystring");
 try {
   var job = new CronJob({
     // cronTime is in following format: "ss mm hh dd mon dwk"
@@ -513,7 +515,8 @@ bot.onText(/\/quiz(|@\w+)(.*)/, (msg, match) => {
   var quiz_URL = ""
   console.log("Result:", result)
   if (result != null) {
-    delaysecs = result[2] * 1000; // "millisecs" to "secs"
+    delaysecs = result[2]; // "millisecs" to "secs"
+    // delaysecs = result[2] * 1000; // "millisecs" to "secs"
   } else {
     var pattern2 = /\s*(.+)\s*/;
     result = text.match(pattern2)
@@ -534,20 +537,21 @@ bot.onText(/\/quiz(|@\w+)(.*)/, (msg, match) => {
 
   myData.getJsonDataFromUrl(quiz_URL).then(quizzes => {
     for (q in quizzes) {
-      // setTimeout(function () {
-        bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
-          is_anonymous: false,
-          type: "quiz",
-          correct_option_id: quizzes[q].correctOption,
-          explanation: quizzes[q].explanation,
-          // open_period: 30,
-          // close_date: 10,
-        }).catch((error) => {
-          console.error(error.code);  // => 'ETELEGRAM'
-          console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
-          bot.sendMessage(chatId, error.response.body.description)
-        });
-      // }, (delaysecs * q));
+      console.log("Sending poll:", quizzes[q])
+      bot.sendPoll(msg.chat.id, quizzes[q].question, quizzes[q].options, {
+        is_anonymous: false,
+        type: "quiz",
+        correct_option_id: quizzes[q].correctOption,
+        explanation: quizzes[q].explanation,
+        // open_period: 30,
+        // close_date: 10,
+      }).catch((error) => {
+        console.error(error.code); // => 'ETELEGRAM'
+        console.error(error.response.body); // => { ok: false, error_code: 400, description: 'Bad Request: ...' }
+        bot.sendMessage(chatId, error.response.body.description);
+      });
+      console.log("Sleeping", delaysecs + "s.")
+      child_process.execSync("sleep " + delaysecs)
     }
   });
 
