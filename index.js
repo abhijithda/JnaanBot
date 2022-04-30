@@ -1,7 +1,8 @@
 require("console-stamp")(console)
 
 const myConfig = require('./config');
-const events = require('./events')
+// TODO: Cleanup events. (Deprecated)
+// const events = require('./events')
 const child_process = require('child_process')
 
 // replace the value below with the Telegram token you receive from @BotFather
