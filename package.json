@@ -4,20 +4,20 @@
   "description": "A bot to share the jnaan!",
   "main": "index.js",
   "dependencies": {
-    "async": "^3.2.3",
-    "console-stamp": "^3.0.4",
-    "cron": "^1.7.1",
-    "google-spreadsheet": "^3.2.0",
-    "htmlparser2": "^3.10.1",
-    "jsdom": "^19.0.0",
-    "module": "^1.0.0",
-    "node-fetch": "^2.6.7",
-    "node-telegram-bot-api": "^0.56.0",
-    "xmldom": "^0.5.0",
-    "xpath": "0.0.27"
+    "async": "^3.2.4",
+    "console-stamp": "^3.1.0",
+    "cron": "^2.2.0",
+    "google-spreadsheet": "^3.3.0",
+    "htmlparser2": "^8.0.1",
+    "jsdom": "^21.1.0",
+    "module": "^1.1.0",
+    "node-fetch": "^2.6.8",
+    "node-telegram-bot-api": "^0.61.0",
+    "xmldom": "^0.6.0",
+    "xpath": "0.0.32"
   },
   "devDependencies": {
-    "mocha": "^9.2.2"
+    "mocha": "^10.2.0"
   },
   "scripts": {
     "start": "node index.js 2>&1 | tee -a console.log",
